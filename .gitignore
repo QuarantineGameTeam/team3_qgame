@@ -1,0 +1,15 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.sh
+*.bin
+
+# Output of the go coverage tool
+*.out
+*.idea/
+
+# Dependency directories
+vendor
+
+
+
