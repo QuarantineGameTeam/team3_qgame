@@ -1,5 +1,1 @@
-# Qgame teamIII
-
-**Prepare to win**
-
-My request game
+Not the one who is stronger wins, but the one who is finds friends
