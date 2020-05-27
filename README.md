@@ -9,3 +9,10 @@ This is a game about the confrontation of the three clans. Victories, battles, b
 
 The player scored the maximum number of points
 This is a game about the confrontation of the three clans. Victories, battles, battles and much more awaits you. Welcome to the game
+
+Our player has the following characteristics:
+- Name
+- Health
+- Power
+- Deffence
+- Level
