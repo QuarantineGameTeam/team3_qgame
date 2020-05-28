@@ -1,72 +1,105 @@
 package repository
 
 import (
-	"gihub.com/team3_qgame/database/transaction"
+	"database/sql"
+	"log"
+
+	"gihub.com/team3_qgame/model"
+
 	"github.com/google/uuid"
 )
 
-type UserRepository struct {
-	manager *transaction.DbContextManager
-}
-
 const (
-	getAllItems = "SELECT id, train_id, plane_id, user_id, place, " +
-		"ticket_type," +
-		" discount, price, total_price, name, surname FROM tickets;"
-	getOneItem = "SELECT id, train_id, plane_id, user_id, place, " +
-		"ticket_type," +
-		" discount, price, total_price, name, " +
-		"surname FROM tickets WHERE id = $1;"
-	addOneItem = "INSERT INTO tickets (id, place, ticket_type, discount, " +
-		"price, total_price, name, surname) " +
-		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
-	updateItem = "UPDATE tickets SET place=$2, ticket_type=$3, " +
-		"discount=$4, " +
-		"price=$5, total_price=$6, name=$7, surname=$8 WHERE id=$1;"
-	deleteItem = "DELETE FROM tickets WHERE id=$1;"
+	getOneItem  = "SELECT id, name FROM users WHERE id = $1;"
+	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
+	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
+	deleteItem  = "DELETE FROM users WHERE id=$1;"
+	getAllItems = "SELECT * FROM users;"
 )
 
-func NewUserRepository(manager *transaction.DbContextManager) *UserRepositoryRepository {
-	return &ProjectRepository{
-		manager: manager,
+type UserRepository struct {
+	conn *sql.DB
+}
+
+func NewUserRepository(conn *sql.DB) *UserRepository {
+	return &UserRepository{
+		conn: conn,
 	}
 }
 
-func (p *ProjectRepository) NewUser(ctx context.Context, project *model.Project) (*model.Project, error) {
-	tr, _ := p.manager.GetTransactionContext(ctx)
-
-	project.ProjectID = uuid.New().String()
-
-	err := tr.Provider().Create(project).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return project, nil
-}
-
-//CreateTicket sends a query for creating new one ticket
-func (*ticketRepository) CreateTicket(tk data.Ticket) error {
-	_, err := Db.Exec(addOneItem, tk.ID, tk.Place, tk.TicketType, tk.Discount,
-		tk.Price, tk.TotalPrice, tk.Name, tk.Surname)
+//NewUser sends a query for creating new one ticket
+func (p *UserRepository) NewUser(user model.User) error {
+	result, err := p.conn.Exec(addOneItem, user.ID, user.Name)
 	if err != nil {
 		return err
 	}
+
+	rowAff, _ := result.RowsAffected()
+	log.Printf("Affected %d rows\n", rowAff)
+
 	return nil
 }
 
-func (p *ProjectRepository) GetByID(ctx context.Context, id uint) (*model.Project, error) {
-	tr, _ := p.manager.GetTransactionContext(ctx)
+//GetUser sends a query for get certain user from DB
+func (p *UserRepository) GetUserByID(id uuid.UUID) (model.User, error) {
+	user := model.User{}
+	row := p.conn.QueryRow(getOneItem, id)
 
-	var projects []*model.Project
-	err := tr.Provider().First(&projects).Where("id", id).Error
+	err := row.Scan(&user.ID, &user.Name)
+	if err != nil {
+		return user, err
+	}
 
+	return user, nil
+}
+
+//UpdateUser sends a query for updating one User
+func (p *UserRepository) UpdateUser(user model.User) error {
+	result, err := p.conn.Exec(updateItem, user.ID, user.Name)
+	if err != nil {
+		return err
+	}
+
+	rowAff, _ := result.RowsAffected()
+	log.Printf("Affected %d rows\n", rowAff)
+
+	return nil
+}
+
+//DeleteUser sends a query for deleting one User by ID
+func (p *UserRepository) DeleteUserByID(id uuid.UUID) error {
+	result, err := p.conn.Exec(deleteItem, id)
+	if err != nil {
+		return err
+	}
+
+	rowAff, _ := result.RowsAffected()
+	log.Printf("Affected %d rows\n", rowAff)
+
+	return nil
+}
+
+// GetAllUsers sends a query for getting all users
+func (p *UserRepository) GetAllUsers() ([]model.User, error) {
+	rows, err := p.conn.Query(getAllItems)
 	if err != nil {
 		return nil, err
 	}
-	if len(projects) == 0 {
-		return nil, errors.NotFoundError
+	defer rows.Close()
+
+	users := make([]model.User, 0)
+
+	for rows.Next() {
+		u := model.User{}
+		err := rows.Scan(&u.ID, &u.Name)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, u)
 	}
-	return projects[0], nil
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
 }

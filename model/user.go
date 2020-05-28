@@ -8,7 +8,7 @@ import "github.com/google/uuid"
 	in our case, from the bot.
 */
 
-//User struct contains user data
+// User struct contains user data
 type User struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`

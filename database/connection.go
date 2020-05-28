@@ -24,6 +24,7 @@ type DBConnection struct {
 }
 
 func NewDBConnection(config *config.DBConfig) *DBConnection {
+	config.InitPgConfig()
 	return &DBConnection{
 		config: config,
 	}

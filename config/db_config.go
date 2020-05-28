@@ -27,7 +27,7 @@ const (
 	dbname   = "team3bot"
 )
 
-func (c *DBConfig) initPgConfig() {
+func (c *DBConfig) InitPgConfig() {
 	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
 	flag.IntVar(&c.Port, "pg_port", port, "database port")
 	flag.StringVar(&c.User, "pg_user", user, "database user name")
