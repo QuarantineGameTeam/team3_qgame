@@ -10,6 +10,13 @@ import "github.com/google/uuid"
 
 // User struct contains user data
 type User struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"name"`
+	ID       	uuid.UUID `json:"id"`
+	Name     	string    `json:"name"`
+	Team	 	string    `json:"team"`
+	Role 	 	string    `json:"role"`
+	Health	 	float32   `json:"health"`
+	Strength	float32   `json:"str"`
+	Defence	 	float32   `json:"def"`
+	Intellect	float32   `json:"int"`
+	Level	 	float32   `json:"lvl"`
 }
