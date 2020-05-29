@@ -12,4 +12,10 @@ import "github.com/google/uuid"
 type User struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
+	Team	 	string    `json:"team"`
+	Health	 	float32   `json:"health"`
+	Strength	float32   `json:"str"`
+	Protection  float32   `json:"prot"`
+	Intellect	float32   `json:"int"`
+	Level	 	float32   `json:"lvl"`
 }
