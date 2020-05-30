@@ -11,6 +11,7 @@ import (
 
 const (
 	getOneItem  = "SELECT id, name FROM users WHERE id = $1;"
+	getOneItem  = "SELECT id, name, health, str, def, int, lvl, team FROM users WHERE id = $1;"
 	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
 	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
 	deleteItem  = "DELETE FROM users WHERE id=$1;"
