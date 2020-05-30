@@ -1,25 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"gihub.com/team3_qgame/database/repository"
 	"gihub.com/team3_qgame/model"
-	"github.com/google/uuid"
 	"log"
 
 	"gihub.com/team3_qgame/config"
 	"gihub.com/team3_qgame/database"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 /*
 	In the main file we collect all function that needed for running our app.
 */
 
-var newDBConfig *config.DBConfig
+var newDBConfig config.DBConfig
 
 func main() {
 
-	NewDBConnection := database.NewDBConnection(newDBConfig)
+	NewDBConnection := database.NewDBConnection(&newDBConfig)
 	err := NewDBConnection.Connect()
 	if err != nil {
 		log.Fatal("Connection to DB failed")
@@ -32,20 +32,20 @@ func main() {
 	userRepo := repository.NewUserRepository(conn)
 
 	//
-	GamerNoOne := model.User{
-		ID: uuid.New(),
-	 	Name: "Alessandro",
+	/*GamerNoOne := model.User{
+		ID:   uuid.New(),
+		Name: "Alessandro",
 	}
 
 	GamerNoTwo := model.User{
-		ID: uuid.New(),
+		ID:   uuid.New(),
 		Name: "Jessica",
 	}
 
 	// Записуємо дані користувача "Alessandro" в базу данних
 	_ = userRepo.NewUser(GamerNoOne)
 	// Записуємо дані користувача "Jessica" в базу данних
-	_ = userRepo.NewUser(GamerNoOne)
+	_ = userRepo.NewUser(GamerNoTwo)
 
 	allUsers, _ := userRepo.GetAllUsers()
 	fmt.Println("All users id DB", allUsers)
@@ -55,12 +55,94 @@ func main() {
 	_ = userRepo.UpdateUser(GamerNoTwo)
 
 	// отримати дані користувача за (UUID) унікальним ідентифікатором
+	gamerNoOne, _ := userRepo.GetUserByID(GamerNoOne.ID)
+	fmt.Println("This is user no one", gamerNoOne)
 	gamerNoTwo, _ := userRepo.GetUserByID(GamerNoTwo.ID)
 	fmt.Println("This is user no two", gamerNoTwo)
 
 	// видалення користувача з бази данних
-	_ = userRepo.DeleteUserByID(GamerNoTwo.ID)
+	//_ = userRepo.DeleteUserByID(GamerNoOne.ID)
 
 	// Дивимось що у нас залишилось в базі після видалення
-	fmt.Println("All users id DB", allUsers)
+	fmt.Println("All users id DB", allUsers)*/
+	bot, err := tgbotapi.NewBotAPI("1218266837:AAF-Z-gn4JlWpv5Fq-x1ReiHb8nhfZhm7aY")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	updates, err := bot.GetUpdatesChan(u)
+
+	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		if update.Message.IsCommand() {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+			switch update.Message.Command() {
+			case "register":
+				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
+				if userCheck.ID != update.Message.Chat.ID {
+					msg.Text = "Enter your name"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil {
+							continue
+						} else {
+							userName := update.Message.Text
+							id := update.Message.Chat.ID
+							newUser := model.User{
+								ID:   id,
+								Name: userName,
+							}
+							_ = userRepo.NewUser(newUser)
+							break
+						}
+					}
+				} else {
+					msg.Text = "Your user is already exists"
+					bot.Send(msg)
+				}
+
+			case "rename":
+				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
+				if userCheck.ID == update.Message.Chat.ID {
+					msg.Text = "Enter your name"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil {
+							continue
+						} else {
+							userName := update.Message.Text
+							thisUser := model.User{
+								ID:   update.Message.Chat.ID,
+								Name: userName,
+							}
+							_ = userRepo.UpdateUser(thisUser)
+						}
+					}
+				} else{
+					msg.Text = "You have no user yet"
+					bot.Send(msg)
+				}
+			case "delete":
+				_ = userRepo.DeleteUserByID(update.Message.Chat.ID)
+				msg.Text = "Your user deleted"
+				bot.Send(msg)
+			default:
+				msg.Text = "I don't know that command"
+			}
+
+		}
+
+	}
 }

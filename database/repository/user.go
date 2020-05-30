@@ -5,16 +5,15 @@ import (
 	"log"
 
 	"gihub.com/team3_qgame/model"
-
-	"github.com/google/uuid"
 )
 
 const (
-	getOneItem  = "SELECT id, name FROM users WHERE id = $1;"
+	getOneItem  = "SELECT id, name, team, role, health, str, def, int, lvl FROM users WHERE id = $1;"
 	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
 	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
 	deleteItem  = "DELETE FROM users WHERE id=$1;"
 	getAllItems = "SELECT * FROM users;"
+
 )
 
 type UserRepository struct {
@@ -29,8 +28,10 @@ func NewUserRepository(conn *sql.DB) *UserRepository {
 
 //NewUser sends a query for creating new one ticket
 func (p *UserRepository) NewUser(user model.User) error {
+
 	result, err := p.conn.Exec(addOneItem, user.ID, user.Name)
 	if err != nil {
+		log.Println("%v\n", user.Name)
 		return err
 	}
 
@@ -41,13 +42,25 @@ func (p *UserRepository) NewUser(user model.User) error {
 }
 
 //GetUser sends a query for get certain user from DB
-func (p *UserRepository) GetUserByID(id uuid.UUID) (model.User, error) {
-	user := model.User{}
+func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
+	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
 
-	err := row.Scan(&user.ID, &user.Name)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil {
 		return user, err
+	} else {
+		user = model.User {
+			ID: user.ID,
+			Name: user.Name,
+			Team: user.Team,
+			Role: user.Role,
+			Health: user.Health,
+			Strength: user.Strength,
+			Defence: user.Defence,
+			Intellect: user.Intellect,
+			Level: user.Level,
+		}
 	}
 
 	return user, nil
@@ -67,7 +80,7 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 }
 
 //DeleteUser sends a query for deleting one User by ID
-func (p *UserRepository) DeleteUserByID(id uuid.UUID) error {
+func (p *UserRepository) DeleteUserByID(id int64) error {
 	result, err := p.conn.Exec(deleteItem, id)
 	if err != nil {
 		return err
