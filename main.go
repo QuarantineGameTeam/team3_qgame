@@ -15,11 +15,11 @@ import (
 	In the main file we collect all function that needed for running our app.
 */
 
-var newDBConfig *config.DBConfig
+var newDBConfig config.DBConfig
 
 func main() {
 
-	NewDBConnection := database.NewDBConnection(newDBConfig)
+	NewDBConnection := database.NewDBConnection(&newDBConfig)
 	err := NewDBConnection.Connect()
 	if err != nil {
 		log.Fatal("Connection to DB failed")
@@ -33,19 +33,19 @@ func main() {
 
 	//
 	GamerNoOne := model.User{
-		ID: uuid.New(),
-	 	Name: "Alessandro",
+		ID:   uuid.New(),
+		Name: "Alessandro",
 	}
 
 	GamerNoTwo := model.User{
-		ID: uuid.New(),
+		ID:   uuid.New(),
 		Name: "Jessica",
 	}
 
 	// Записуємо дані користувача "Alessandro" в базу данних
 	_ = userRepo.NewUser(GamerNoOne)
 	// Записуємо дані користувача "Jessica" в базу данних
-	_ = userRepo.NewUser(GamerNoOne)
+	_ = userRepo.NewUser(GamerNoTwo)
 
 	allUsers, _ := userRepo.GetAllUsers()
 	fmt.Println("All users id DB", allUsers)
