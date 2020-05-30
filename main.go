@@ -65,7 +65,7 @@ func main() {
 
 	// Дивимось що у нас залишилось в базі після видалення
 	fmt.Println("All users id DB", allUsers)*/
-	bot, err := tgbotapi.NewBotAPI("1218266837:AAF-Z-gn4JlWpv5Fq-x1ReiHb8nhfZhm7aY")
+	bot, err := tgbotapi.NewBotAPI("TOKEN")
 	if err != nil {
 		log.Panic(err)
 	}
