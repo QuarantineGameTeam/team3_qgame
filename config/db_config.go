@@ -23,7 +23,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "teem3bot"
+	password = "team3bot"
 	dbname   = "team3bot"
 )
 
@@ -31,8 +31,8 @@ func (c *DBConfig) InitPgConfig() {
 	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
 	flag.IntVar(&c.Port, "pg_port", port, "database port")
 	flag.StringVar(&c.User, "pg_user", user, "database user name")
-	flag.StringVar(&c.Password, "pg_user", password, "database user password")
-	flag.StringVar(&c.DBName, "pg_user", dbname, "name of database")
+	flag.StringVar(&c.Password, "pg_password", password, "database user password")
+	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
 	flag.Parse()
 	log.Printf("app starts whith database configs: host=%s\n, port=%d\n, user_name=%s\n, db_name=%s\n",
 		c.Host, c.Port, c.User, c.DBName)

@@ -11,7 +11,7 @@ import (
 
 const (
 	getOneItem  = "SELECT id, name FROM users WHERE id = $1;"
-	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
+	addOneItem  = "INSERT INTO users (id, name) VALUES ($2, $1)"
 	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
 	deleteItem  = "DELETE FROM users WHERE id=$1;"
 	getAllItems = "SELECT * FROM users;"
@@ -29,7 +29,7 @@ func NewUserRepository(conn *sql.DB) *UserRepository {
 
 //NewUser sends a query for creating new one ticket
 func (p *UserRepository) NewUser(user model.User) error {
-	result, err := p.conn.Exec(addOneItem, user.ID, user.Name)
+	result, err := p.conn.Exec(addOneItem, user.Name, user.ID)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (p *UserRepository) NewUser(user model.User) error {
 
 //GetUser sends a query for get certain user from DB
 func (p *UserRepository) GetUserByID(id uuid.UUID) (model.User, error) {
-	user := model.User{}
+	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
 
 	err := row.Scan(&user.ID, &user.Name)

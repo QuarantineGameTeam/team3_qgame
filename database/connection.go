@@ -3,9 +3,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
+
 	"gihub.com/team3_qgame/config"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 /*
@@ -33,7 +34,6 @@ func NewDBConnection(config *config.DBConfig) *DBConnection {
 func (d *DBConnection) GetConnection() *sql.DB {
 	return d.dbConnection
 }
-
 
 func (d *DBConnection) Connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",

@@ -10,6 +10,6 @@ import "github.com/google/uuid"
 
 // User struct contains user data
 type User struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"name"`
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
