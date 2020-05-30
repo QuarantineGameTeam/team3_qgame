@@ -9,6 +9,7 @@ import (
 
 	"gihub.com/team3_qgame/config"
 	"gihub.com/team3_qgame/database"
+
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -32,16 +33,10 @@ func main() {
 
 	userRepo := repository.NewUserRepository(conn)
 
-	//
-<<<<<<< Updated upstream
-	GamerNoOne := model.User{
-		ID: uuid.New(),
-	 	Name: "Alessandro",
-=======
+
 	/*GamerNoOne := model.User{
 		ID:   uuid.New(),
 		Name: "Alessandro",
->>>>>>> Stashed changes
 	}
 
 	GamerNoTwo := model.User{
