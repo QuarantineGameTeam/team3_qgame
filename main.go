@@ -35,17 +35,42 @@ func main() {
 	GamerNoOne := model.User{
 		ID:   uuid.New(),
 		Name: "Alessandro",
+		Team: "NewY",
+		Health: 100,
+		Strength: 100,	
+		Protection: 200,
+		Intellect: 30,	
+		Level: 12,	
 	}
 
 	GamerNoTwo := model.User{
 		ID:   uuid.New(),
 		Name: "Jessica",
+		Team: "NewY",
+		Health: 101,
+		Strength: 100,	
+		Protection: 200,
+		Intellect: 30,	
+		Level: 12,	
+	}
+
+	GamerNoThree:= model.User{
+		ID:   uuid.New(),
+		Name: "Jessica",
+		Team: "NewY",
+		Health: 101,
+		Strength: 100,	
+		Protection: 200,
+		Intellect: 30,	
+		Level: 12,	
+	
 	}
 
 	// Записуємо дані користувача "Alessandro" в базу данних
 	_ = userRepo.NewUser(GamerNoOne)
 	// Записуємо дані користувача "Jessica" в базу данних
 	_ = userRepo.NewUser(GamerNoTwo)
+	_ = userRepo.NewUser(GamerNoThree)
 
 	allUsers, _ := userRepo.GetAllUsers()
 	fmt.Println("All users id DB", allUsers)
@@ -57,6 +82,12 @@ func main() {
 	// отримати дані користувача за (UUID) унікальним ідентифікатором
 	gamerNoTwo, _ := userRepo.GetUserByID(GamerNoTwo.ID)
 	fmt.Println("This is user no two", gamerNoTwo)
+
+	gamerNoOne, _ := userRepo.GetUserByID(GamerNoOne.ID)
+	fmt.Println("This is user no one", gamerNoOne)	
+
+	gamerNoThree, _ := userRepo.GetUserByID(GamerNoThree.ID)
+	fmt.Println("This is user no one", gamerNoThree)	
 
 	// видалення користувача з бази данних
 	_ = userRepo.DeleteUserByID(GamerNoTwo.ID)

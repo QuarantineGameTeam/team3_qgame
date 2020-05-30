@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	getOneItem  = "SELECT id, name FROM users WHERE id = $1;"
+	getOneItem  = "SELECT id, name, health, strength, protection, intellect, level, team FROM users WHERE id = $1;"
 	addOneItem  = "INSERT INTO users (id, name) VALUES ($2, $1)"
 	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
 	deleteItem  = "DELETE FROM users WHERE id=$1;"
@@ -45,7 +45,7 @@ func (p *UserRepository) GetUserByID(id uuid.UUID) (model.User, error) {
 	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
 
-	err := row.Scan(&user.ID, &user.Name)
+	err := row.Scan(&user.ID, &user.Name, &user.Health, &user.Protection, &user.Strength, &user.Intellect, &user.Level, &user.Team, )
 	if err != nil {
 		return user, err
 	}
