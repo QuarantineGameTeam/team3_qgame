@@ -2,7 +2,6 @@ package main
 
 import (
 	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/model"
 	"log"
 
 	"gihub.com/team3_qgame/config"
@@ -99,13 +98,10 @@ func main() {
 							continue
 						} else {
 							userName := update.Message.Text
-							id := update.Message.Chat.ID
-							newUser := model.User{
-								ID:   id,
-								Name: userName,
-							}
-							_ = userRepo.NewUser(newUser)
-							msg.Text = "Welcome! Your username is " +newUser.Name
+							userCheck.ID = update.Message.Chat.ID
+							userCheck.Name = userName
+							_ = userRepo.NewUser(userCheck)
+							msg.Text = "Welcome! Your username is " + userCheck.Name
 							bot.Send(msg)
 							break
 						}
@@ -118,19 +114,16 @@ func main() {
 			case "rename":
 				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
 				if userCheck.ID == update.Message.Chat.ID {
-					msg.Text = "Enter your name"
+					msg.Text = "Enter your new name"
 					bot.Send(msg)
 					for update := range updates {
 						if update.Message == nil {
 							continue
 						} else {
 							userName := update.Message.Text
-							thisUser := model.User{
-								ID:   update.Message.Chat.ID,
-								Name: userName,
-							}
-							_ = userRepo.UpdateUser(thisUser)
-							msg.Text = "Your new username is " + thisUser.Name
+							userCheck.Name = userName
+							_ = userRepo.UpdateUser(userCheck)
+							msg.Text = "Your new username is " + userCheck.Name
 							bot.Send(msg)
 							break
 						}
@@ -154,12 +147,12 @@ func main() {
 					bot.Send(msg)
 				}
 			case "help":
-				msg.Text = "/register - bot registrate new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				msg.Text = "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
 				bot.Send(msg)
 			default:
 				msg.Text = "I don't know that command"
 				bot.Send(msg)
-				msg.Text = "/register - bot registrate new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				msg.Text = "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
 				bot.Send(msg)
 			}
 
