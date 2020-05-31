@@ -153,8 +153,14 @@ func main() {
 					msg.Text = "You have no user yet"
 					bot.Send(msg)
 				}
+			case "help":
+				msg.Text = "/register - bot registrate new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				bot.Send(msg)
 			default:
 				msg.Text = "I don't know that command"
+				bot.Send(msg)
+				msg.Text = "/register - bot registrate new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				bot.Send(msg)
 			}
 
 		} else{
