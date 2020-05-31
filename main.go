@@ -105,6 +105,8 @@ func main() {
 								Name: userName,
 							}
 							_ = userRepo.NewUser(newUser)
+							msg.Text = "Welcome! Your username is " +newUser.Name
+							bot.Send(msg)
 							break
 						}
 					}
@@ -128,6 +130,8 @@ func main() {
 								Name: userName,
 							}
 							_ = userRepo.UpdateUser(thisUser)
+							msg.Text = "Your new username is " + thisUser.Name
+							bot.Send(msg)
 							break
 						}
 					}
@@ -139,10 +143,23 @@ func main() {
 				_ = userRepo.DeleteUserByID(update.Message.Chat.ID)
 				msg.Text = "Your user deleted"
 				bot.Send(msg)
+			case "me":
+				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
+				if userCheck.ID == update.Message.Chat.ID {
+					msg.Text = "Your username is " + userCheck.Name
+					bot.Send(msg)
+					break
+				} else {
+					msg.Text = "You have no user yet"
+					bot.Send(msg)
+				}
 			default:
 				msg.Text = "I don't know that command"
 			}
 
+		} else{
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			bot.Send(msg)
 		}
 
 	}
