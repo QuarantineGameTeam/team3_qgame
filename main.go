@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gihub.com/team3_qgame/database/repository"
 	"log"
 
@@ -94,7 +95,7 @@ func main() {
 
 		if update.Message.IsCommand() {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-			helpMsg := "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+			helpMsg := "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name\n/allusers - get every bot users"
 			switch update.Message.Command() {
 			case "register":
 				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
@@ -152,6 +153,12 @@ func main() {
 					break
 				} else {
 					msg.Text = "You have no user yet"
+					bot.Send(msg)
+				}
+			case "allusers":
+				allUsers, _ := userRepo.GetAllUsers()
+				for i, _ := range allUsers{
+					msg.Text = fmt.Sprintf("%+v", allUsers[i])
 					bot.Send(msg)
 				}
 			case "help":

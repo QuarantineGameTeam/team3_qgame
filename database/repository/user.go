@@ -99,20 +99,20 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	users := make([]model.User, 0)
-
 	for rows.Next() {
 		u := model.User{}
-		err := rows.Scan(&u.ID, &u.Name)
+		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Role, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level)
 		if err != nil {
-			return nil, err
+			users = append(users, u)
 		}
-		users = append(users, u)
+
+		log.Printf("\n%v\n", u.Name)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return users, nil
 }
