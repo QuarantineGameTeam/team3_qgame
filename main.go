@@ -128,6 +128,7 @@ func main() {
 								Name: userName,
 							}
 							_ = userRepo.UpdateUser(thisUser)
+							break
 						}
 					}
 				} else{
