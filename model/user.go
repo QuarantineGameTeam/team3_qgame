@@ -13,8 +13,8 @@ type User struct {
 	Team	 	string    `json:"team"`
 	Role 	 	string    `json:"role"`
 	Health	 	float32   `json:"health"`
-	Strength	float32   `json:"str"`
-	Defence	 	float32   `json:"def"`
-	Intellect	float32   `json:"int"`
-	Level	 	float32   `json:"lvl"`
+	Strength	float32   `json:"strength"`
+	Defence	 	float32   `json:"defence"`
+	Intellect	float32   `json:"intellect"`
+	Level	 	float32   `json:"level"`
 }

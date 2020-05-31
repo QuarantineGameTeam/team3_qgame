@@ -64,6 +64,13 @@ func main() {
 
 	// Дивимось що у нас залишилось в базі після видалення
 	fmt.Println("All users id DB", allUsers)*/
+
+
+	//var BigButton = tgbotapi.NewReplyKeyboard(
+	//	tgbotapi.NewKeyboardButtonRow(
+	//		tgbotapi.NewKeyboardButton("Click here for help"),
+	//		),
+	//)
 	bot, err := tgbotapi.NewBotAPI("TOKEN")
 	if err != nil {
 		log.Panic(err)
@@ -87,6 +94,7 @@ func main() {
 
 		if update.Message.IsCommand() {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+			helpMsg := "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
 			switch update.Message.Command() {
 			case "register":
 				userCheck, _ := userRepo.GetUserByID(update.Message.Chat.ID)
@@ -147,12 +155,12 @@ func main() {
 					bot.Send(msg)
 				}
 			case "help":
-				msg.Text = "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				msg.Text = helpMsg
 				bot.Send(msg)
 			default:
 				msg.Text = "I don't know that command"
 				bot.Send(msg)
-				msg.Text = "/register - bot register new user\n/rename - change user name\n/delete - delete user\n/me - shows your name"
+				msg.Text = helpMsg
 				bot.Send(msg)
 			}
 
