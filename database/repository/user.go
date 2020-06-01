@@ -8,6 +8,7 @@ import (
 )
 
 const (
+
 	getOneItem  = "SELECT id, name, team, role, health, strength, defence, intellect, level FROM users WHERE id = $1;"
 	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
 	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
@@ -28,7 +29,6 @@ func NewUserRepository(conn *sql.DB) *UserRepository {
 
 //NewUser sends a query for creating new one ticket
 func (p *UserRepository) NewUser(user model.User) error {
-
 	result, err := p.conn.Exec(addOneItem, user.ID, user.Name)
 	if err != nil {
 		log.Println("%v\n", user.Name)

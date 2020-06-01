@@ -1,3 +1,4 @@
+
 -- Tickets
 CREATE TABLE users
 (
