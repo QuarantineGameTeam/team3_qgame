@@ -21,7 +21,7 @@ type DBConfig struct {
 
 const (
 	host     = "localhost"
-	port     = 5432
+	dbPort   = 5432
 	user     = "postgres"
 	password = "team3bot"
 	dbname   = "team3bot"
@@ -29,7 +29,7 @@ const (
 
 func (c *DBConfig) InitPgConfig() {
 	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
-	flag.IntVar(&c.Port, "pg_port", port, "database port")
+	flag.IntVar(&c.Port, "pg_port", dbPort, "database port")
 	flag.StringVar(&c.User, "pg_user", user, "database user name")
 	flag.StringVar(&c.Password, "pg_password", password, "database user password")
 	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
