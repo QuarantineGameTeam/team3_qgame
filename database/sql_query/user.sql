@@ -1,7 +1,15 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tickets
 CREATE TABLE users
 (
-    id   uuid not null DEFAULT uuid_generate_v4(),
+    id   INTEGER NOT NULL,
     name VARCHAR(30),
+    team TEXT,
+    role TEXT,
+    health DECIMAL NOT NULL DEFAULT 100,
+    strength DECIMAL NOT NULL DEFAULT 1,
+    defence DECIMAL NOT NULL DEFAULT 1,
+    intellect DECIMAL NOT NULL DEFAULT 1,
+    level DECIMAL NOT NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
