@@ -51,7 +51,6 @@ func (d *DBConnection) Connect() error {
 
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
 		
 		return err
 	}
