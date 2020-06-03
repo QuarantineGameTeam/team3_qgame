@@ -3,9 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"gihub.com/team3_qgame/config/database"
 	"log"
 
-	"gihub.com/team3_qgame/config"
 	_ "github.com/lib/pq"
 )
 
@@ -21,11 +21,10 @@ import (
 
 type DBConnection struct {
 	dbConnection *sql.DB
-	config       *config.DBConfig
+	config       *database.DBConfig
 }
 
-func NewDBConnection(config *config.DBConfig) *DBConnection {
-	config.InitPgConfig()
+func NewDBConnection(config *database.DBConfig) *DBConnection {
 	return &DBConnection{
 		config: config,
 	}
