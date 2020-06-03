@@ -26,13 +26,17 @@ type DBConnection struct {
 
 func NewDBConnection(config *config.DBConfig) *DBConnection {
 	config.InitPgConfig()
+	//fmt.Println(config.InitPgConfig)
 	return &DBConnection{
 		config: config,
 	}
+
 }
 
 func (d *DBConnection) GetConnection() *sql.DB {
+
 	return d.dbConnection
+
 }
 
 func (d *DBConnection) Connect() error {
@@ -41,11 +45,13 @@ func (d *DBConnection) Connect() error {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
+
 		return err
 	}
 
 	err = db.Ping()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
