@@ -21,7 +21,6 @@ type DBConfig struct {
 
 const (
 	host     = "localhost"
-	port     = 5432
 	dbport   = 5432
 	user     = "postgres"
 	password = "team3bot"
