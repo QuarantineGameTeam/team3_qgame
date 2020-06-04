@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 
+	"gihub.com/team3_qgame/actions"
 	"gihub.com/team3_qgame/api"
 	"gihub.com/team3_qgame/api/controller"
+	"gihub.com/team3_qgame/api/updater"
 	"gihub.com/team3_qgame/config"
+	"gihub.com/team3_qgame/database"
+	"gihub.com/team3_qgame/database/repository"
 )
 
 /*
@@ -20,16 +22,27 @@ func main() {
 	var appConfig config.Config
 	appConfig.InitConfig()
 
+	// Initiate connection to database
+	dbConn := database.NewDBConnection(&appConfig.DBConfig)
+	conn, err := dbConn.GetConnection()
+	if err != nil {
+		log.Println("DB connection failure, error:", err.Error())
+	}
 
+	// Create new instance of user repository
+	userRepo := repository.NewUserRepository(conn)
+
+	// Initiate new bot connection
 	bot := api.NewBot(&appConfig.BotConfig)
-
 	botController := controller.NewBotController(bot)
-	botController.StartWebHookListener()
 
+	// Initiate new user action instance
+	userAct := actions.NewUser(userRepo)
 
-	//fmt.Println(bot, dbConn)
-	fmt.Println("CONFIG", appConfig)
+	// Create new update Manager
+	updManager := updater.NewUpdateManager(userAct)
 
-	log.Println("PORT!!!!!!", appConfig.BotConfig.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprint(":", appConfig.BotConfig.Port), nil))
+	//var useract user.UpdateManager
+	//var uact user.UpdateManager
+	botController.StartWebHookListener(updManager)
 }

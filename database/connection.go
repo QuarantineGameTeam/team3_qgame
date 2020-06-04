@@ -30,11 +30,16 @@ func NewDBConnection(config *database.DBConfig) *DBConnection {
 	}
 }
 
-func (d *DBConnection) GetConnection() *sql.DB {
-	return d.dbConnection
+func (d *DBConnection) GetConnection() (*sql.DB, error) {
+	err :=  d.connect()
+	if err != nil {
+		return nil, err
+	}
+
+	return d.dbConnection, nil
 }
 
-func (d *DBConnection) Connect() error {
+func (d *DBConnection) connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		d.config.Host, d.config.Port, d.config.User, d.config.Password, d.config.DBName)
 

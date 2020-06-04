@@ -1,9 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"gihub.com/team3_qgame/config/bot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+	"net/http"
 )
 
 type Bot struct {
@@ -27,6 +29,8 @@ func (b *Bot) InitiateBot() error {
 	if err != nil {
 		return err
 	}
+
+	go b.startBotServer()
 
 	return nil
 }
@@ -56,4 +60,8 @@ func (b *Bot) setWebHook() (tgbotapi.APIResponse, error) {
 		return APIResponse, err
 	}
 	return APIResponse, err
+}
+
+func (b *Bot) startBotServer() {
+	log.Fatalln(http.ListenAndServe(fmt.Sprint(":", b.config.Port), nil))
 }
