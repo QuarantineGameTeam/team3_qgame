@@ -31,7 +31,7 @@ func NewDBConnection(config *database.DBConfig) *DBConnection {
 }
 
 func (d *DBConnection) GetConnection() (*sql.DB, error) {
-	err :=  d.connect()
+	err := d.connect()
 	if err != nil {
 		return nil, err
 	}
