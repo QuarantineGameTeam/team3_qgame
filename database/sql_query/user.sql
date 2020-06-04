@@ -1,5 +1,3 @@
-
--- Tickets
 CREATE TABLE users
 (
     id   INTEGER NOT NULL,
@@ -13,3 +11,10 @@ CREATE TABLE users
     level DECIMAL NOT NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
+
+INSERT INTO public.users
+(name)
+VALUES
+('Luke'),
+('Leia'),
+('Han');

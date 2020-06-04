@@ -24,20 +24,20 @@ type DBConnection struct {
 	config       *config.DBConfig
 }
 
-func NewDBConnection(config *config.DBConfig) *DBConnection {
-	config.InitPgConfig()
+func NewDBConnection(dbconfig *config.DBConfig) *DBConnection {
+	dbconfig.InitPgConfig()
 	return &DBConnection{
-		config: config,
+		config: dbconfig,
 	}
 }
 
-func (d *DBConnection) GetConnection() *sql.DB {
+func (d *DBConnection) GetConnection() (*sql.DB) {
 	return d.dbConnection
 }
 
 func (d *DBConnection) Connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		d.config.Host, d.config.Port, d.config.User, d.config.Password, d.config.DBName)
+		d.config.Host, d.config.DBPort, d.config.User, d.config.Password, d.config.DBName)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {

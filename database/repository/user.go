@@ -21,6 +21,10 @@ type UserRepository struct {
 	conn *sql.DB
 }
 
+type NullString struct {
+	sql.NullString
+}
+
 func NewUserRepository(conn *sql.DB) *UserRepository {
 	return &UserRepository{
 		conn: conn,
@@ -29,6 +33,7 @@ func NewUserRepository(conn *sql.DB) *UserRepository {
 
 //NewUser sends a query for creating new one ticket
 func (p *UserRepository) NewUser(user model.User) error {
+
 	result, err := p.conn.Exec(addOneItem, user.ID, user.Name)
 	if err != nil {
 		log.Println("%v\n", user.Name)
@@ -62,7 +67,7 @@ func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 			Level: user.Level,
 		}
 	}
-
+	log.Printf("\n%v %v\n", user.Name, user.Defence)
 	return user, nil
 }
 
@@ -106,8 +111,8 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 		if err != nil {
 			users = append(users, u)
 		}
-
-		log.Printf("\n%v\n", u.Name)
+		users = append(users, u)
+		log.Printf("\n%v %v\n", u.Name, u.Defence)
 	}
 
 	if err = rows.Err(); err != nil {

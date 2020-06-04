@@ -13,7 +13,7 @@ import (
 
 type DBConfig struct {
 	Host     string
-	Port     int
+	DBPort   int
 	User     string
 	Password string
 	DBName   string
@@ -22,6 +22,7 @@ type DBConfig struct {
 const (
 	host     = "localhost"
 	port     = 5432
+	dbport   = 5432
 	user     = "postgres"
 	password = "team3bot"
 	dbname   = "team3bot"
@@ -29,11 +30,10 @@ const (
 
 func (c *DBConfig) InitPgConfig() {
 	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
-	flag.IntVar(&c.Port, "pg_port", port, "database port")
+	flag.IntVar(&c.DBPort, "pg_port", dbport, "database port")
 	flag.StringVar(&c.User, "pg_user", user, "database user name")
 	flag.StringVar(&c.Password, "pg_password", password, "database user password")
 	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
-	flag.Parse()
-	log.Printf("app starts whith database configs:\n host=%s ,\n port=%d ,\n user_name=%s ,\n db_name=%s ;\n",
-		c.Host, c.Port, c.User, c.DBName)
+	log.Printf("app starts whith database configs:\n host=%s,\n port=%d,\n user_name=%s,\n db_name=%s;\n",
+		c.Host, c.DBPort, c.User, c.DBName)
 }
