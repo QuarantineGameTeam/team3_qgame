@@ -1,5 +1,4 @@
 package repository
-
 import (
 	"database/sql"
 	"log"
