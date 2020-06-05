@@ -91,9 +91,9 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 		u := model.User{}
 		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Role, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level)
 		if err != nil {
-			users = append(users, u)
+			log.Println("Error:", err.Error())
 		}
-
+		users = append(users, u)
 		log.Printf("\n%v\n", u.Name)
 	}
 

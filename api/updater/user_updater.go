@@ -47,9 +47,11 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 		case "delete":
 			u.user.CDelete(update)
 		case "me":
-			u.user.CGetInfo(update)
+			u.user.CGetUserInfo(update)
 		case "allusers":
 			u.user.CGetAllUsers(update)
+		case "help":
+			u.user.CHelp(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
@@ -57,7 +59,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 }
 
 func (u *UpdateManager) CallbackQuery(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "dfasdf")
+	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
 	switch update.CallbackQuery.Data {
 	case "4":
 		msg.Text = "You hit the '4' button!"

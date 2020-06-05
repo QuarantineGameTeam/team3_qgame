@@ -6,6 +6,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+const(
+	helpMsg = "/register - bot register new user" +
+//		"\n/rename - change user name" +
+		"\n/delete - delete user" +
+		"\n/me - shows your use data" +
+		"\n/allusers - get every bot users"
+)
+
 type User struct {
 	userRepo *repository.UserRepository
 	bot      *tgbotapi.BotAPI
@@ -27,6 +35,7 @@ func (u *User) CStart(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome tho the game! Chose registration")
 	_, _ = u.bot.Send(msg)
 }
+
 func (u *User) CRegistration(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
@@ -58,7 +67,8 @@ func (u *User) CDelete(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
-func (u *User) CGetInfo(update tgbotapi.Update) {
+
+func (u *User) CGetUserInfo(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	if userCheck.ID == update.Message.Chat.ID {
@@ -78,3 +88,10 @@ func (u *User) CGetAllUsers(update tgbotapi.Update) {
 		u.bot.Send(msg)
 	}
 }
+
+func (u *User) CHelp(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	msg.Text = helpMsg
+	u.bot.Send(msg)
+}
+
