@@ -1,11 +1,35 @@
 package database
 
 /*
-	This is where the client’s database connection code is implemented.
-	Typically, the server side is implemented such that a new thread processes requests for the connection.
-	A connection pool is implemented here to minimize outlet opening.
-	Usually, you are not indifferent through the connection (if everyone is connected as the same user)
-	that you received the database result set. You do not want to consume resources, so you want to be pleasant,
-	and when you are done, you close the connection. I believe that every server ends the connection today if there
-	is no activity for some time (timeout), that is, working with the database.
+	config repository designed to store data related to presets,
+	telling the part of the software that is closed from the user,
+	how to proceed in the case specified by the rules.
 */
+
+import (
+	"flag"
+)
+
+type DBConfig struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBName   string
+}
+
+const (
+	host     = "localhost"
+	dbPort   = 5432
+	user     = "postgres"
+	password = "team3bot"
+	dbname   = "team3bot"
+)
+
+func (c *DBConfig) InitPgConfig() {
+	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
+	flag.IntVar(&c.Port, "pg_port", dbPort, "database port")
+	flag.StringVar(&c.User, "pg_user", user, "database user name")
+	flag.StringVar(&c.Password, "pg_password", password, "database user password")
+	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
+}
