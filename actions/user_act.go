@@ -11,6 +11,14 @@ type User struct {
 	updates  tgbotapi.UpdatesChannel
 }
 
+var InformationKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("about me", "5"),
+		tgbotapi.NewInlineKeyboardButtonData("about game", "1"),
+		tgbotapi.NewInlineKeyboardButtonData("Rating", "33"),
+	),
+)
+
 func NewUser(userRepo *repository.UserRepository) *User {
 	return &User{
 		userRepo: userRepo,
@@ -50,7 +58,10 @@ func (u *User) MSRegistration(update tgbotapi.Update) {
 		u.bot.Send(msg)
 	}
 }
-func (u *User) method2() {
+func (u *User) MSIformation(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "What information is needed?")
+	msg.ReplyMarkup = InformationKeyboard
+	_, _ = u.bot.Send(msg)
 }
 
 func (u *User) method3() {}
