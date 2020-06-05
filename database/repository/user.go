@@ -11,7 +11,7 @@ import (
 const (
 	getOneItem  = `SELECT * FROM public.users WHERE id = $1;`
 	addOneItem  = `INSERT INTO public.users (id, name) VALUES ($1, $2);`
-	updateItem  = `UPDATE public.users SET name=$2 WHERE id=$1;`
+	updateItem  = `UPDATE public.users SET name=$2 team=$3 role=$4 health=$5 strength=$6 defence=$7 intellect=$8 level=$9 WHERE id=$1;`
 	deleteItem  = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems = `SELECT * FROM public.users;`
 )
@@ -55,7 +55,18 @@ func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 
 //UpdateUser sends a query for updating one User
 func (p *UserRepository) UpdateUser(user model.User) error {
-	result, err := p.conn.Exec(updateItem, user.ID, user.Name)
+	result, err := p.conn.Exec(
+		updateItem,
+		user.ID,
+		user.Name,
+		user.Team.String,
+		user.Role.String,
+		user.Health,
+		user.Strength,
+		user.Defence,
+		user.Intellect,
+		user.Level,
+	)
 	if err != nil {
 		return err
 	}
