@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"gihub.com/team3_qgame/database/repository"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -13,6 +12,7 @@ import (
 
 type UserData struct {
 	userPrepo *repository.UserRepository
+	userPrepo *UserRepository
 	bot       *tgbotapi.BotAPI
 	update    tgbotapi.Update
 	updates   tgbotapi.UpdatesChannel
@@ -20,6 +20,7 @@ type UserData struct {
 }
 
 func NewUseData(userPrepo *repository.UserRepository, bot *tgbotapi.BotAPI,	update tgbotapi.Update,
+func NewUseData(userPrepo *UserRepository, bot *tgbotapi.BotAPI,	update tgbotapi.Update,
 	updates tgbotapi.UpdatesChannel,
 	msg tgbotapi.MessageConfig,
 ) *UserData {
