@@ -38,15 +38,18 @@ func (u *UpdateManager) SetUpdates(bot *tgbotapi.BotAPI, updates tgbotapi.Update
 }
 
 func (u *UpdateManager) Messages(update tgbotapi.Update) {
-	if update.Message.Text != "" {
-		switch update.Message.Text {
-		case "/start":
-			u.user.MSStart(update)
-		case "/register":
-			u.user.MSRegistration(update)
-		//case "/close":
-		//
-		//case "/plus":
+	if update.Message.IsCommand() {
+		switch update.Message.Command() {
+		case "start":
+			u.user.CStart(update)
+		case "register":
+			u.user.CRegistration(update)
+		case "delete":
+			u.user.CDelete(update)
+		case "me":
+			u.user.CGetInfo(update)
+		case "allusers":
+			u.user.CGetAllUsers(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}

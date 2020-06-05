@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"gihub.com/team3_qgame/database/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -22,11 +23,11 @@ func (u *User) SetUpdates(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel)
 	u.updates = updates
 }
 
-func (u *User) MSStart(update tgbotapi.Update) {
+func (u *User) CStart(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome tho the game! Chose registration")
 	_, _ = u.bot.Send(msg)
 }
-func (u *User) MSRegistration(update tgbotapi.Update) {
+func (u *User) CRegistration(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	if userCheck.ID != update.Message.Chat.ID {
@@ -50,7 +51,30 @@ func (u *User) MSRegistration(update tgbotapi.Update) {
 		u.bot.Send(msg)
 	}
 }
-func (u *User) method2() {
+func (u *User) CDelete(update tgbotapi.Update) {
+	_ = u.userRepo.DeleteUserByID(update.Message.Chat.ID)
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	msg.Text = "Your user deleted"
+	u.bot.Send(msg)
 }
 
-func (u *User) method3() {}
+func (u *User) CGetInfo(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if userCheck.ID == update.Message.Chat.ID {
+		msg.Text = "Your user info:" + fmt.Sprintf("\n%+v", userCheck)
+		u.bot.Send(msg)
+	} else {
+		msg.Text = "You have no user yet"
+		u.bot.Send(msg)
+	}
+}
+
+func (u *User) CGetAllUsers(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	allUsers, _ := u.userRepo.GetAllUsers()
+	for i, _ := range allUsers{
+		msg.Text = fmt.Sprintf("%+v", allUsers[i])
+		u.bot.Send(msg)
+	}
+}
