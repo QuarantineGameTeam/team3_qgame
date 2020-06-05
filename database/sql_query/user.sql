@@ -1,5 +1,3 @@
-
--- Tickets
 CREATE TABLE users
 (
     id   INTEGER NOT NULL,
