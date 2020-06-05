@@ -19,7 +19,6 @@ func NewBot(botConfig *config.BotConfig) *Bot {
 }
 
 func (b *Bot) NewBotAPI() error {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
 		return err
 	}
