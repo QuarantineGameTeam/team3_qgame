@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"gihub.com/team3_qgame/service"
 	"log"
 
+	"gihub.com/team3_qgame/api"
 	"gihub.com/team3_qgame/config"
 	"gihub.com/team3_qgame/database"
-	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/api"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -31,7 +29,7 @@ func main() {
 	// зараз він тут для нагядності
 	conn := NewDBConnection.GetConnection()
 
-	userRepo := repository.NewUserRepository(conn)
+	userRepo := service.NewUserRepository(conn)
 
 	//
 
