@@ -11,7 +11,6 @@ import (
 */
 
 type UserData struct {
-	userPrepo *repository.UserRepository
 	userPrepo *UserRepository
 	bot       *tgbotapi.BotAPI
 	update    tgbotapi.Update
@@ -19,7 +18,6 @@ type UserData struct {
 	msg       tgbotapi.MessageConfig
 }
 
-func NewUseData(userPrepo *repository.UserRepository, bot *tgbotapi.BotAPI,	update tgbotapi.Update,
 func NewUseData(userPrepo *UserRepository, bot *tgbotapi.BotAPI,	update tgbotapi.Update,
 	updates tgbotapi.UpdatesChannel,
 	msg tgbotapi.MessageConfig,
