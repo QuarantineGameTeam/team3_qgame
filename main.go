@@ -1,106 +1,48 @@
 package main
 
 import (
-	"fmt"
-	"gihub.com/team3_qgame/service"
 	"log"
 
+	"gihub.com/team3_qgame/actions"
+	"gihub.com/team3_qgame/api"
+	"gihub.com/team3_qgame/api/controller"
+	"gihub.com/team3_qgame/api/updater"
 	"gihub.com/team3_qgame/config"
 	"gihub.com/team3_qgame/database"
 	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/api"
-
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 /*
-	In the main file we collect all function that needed for running our app.
+	In the main file we collect all function that needed for running app.
 */
-
-var newDBConfig config.DBConfig
 
 func main() {
 
-	NewDBConnection := database.NewDBConnection(&newDBConfig)
-	err := NewDBConnection.Connect()
+	// Initiate program configuration
+	var appConfig config.Config
+	appConfig.InitConfig()
+
+	// Initiate connection to database
+	dbConn := database.NewDBConnection(&appConfig.DBConfig)
+	conn, err := dbConn.GetConnection()
 	if err != nil {
-		log.Fatal("Connection to DB failed")
+		log.Println("DB connection failure, error:", err.Error())
 	}
 
-	// Нижче код буде в майбутньому перенесений в папку з логікою гри
-	// зараз він тут для нагядності
-	conn := NewDBConnection.GetConnection()
-
+	// Create new instance of user repository
 	userRepo := repository.NewUserRepository(conn)
 
-	//
+	// Initiate new bot connection
+	bot := api.NewBot(&appConfig.BotConfig)
+	botController := controller.NewBotController(bot)
 
-	/*GamerNoOne := model.User{
-		ID:   uuid.New(),
-		Name: "Alessandro",
-	}
+	// Initiate new user action instance
+	userAct := actions.NewUser(userRepo)
 
-	GamerNoTwo := model.User{
-		ID:   uuid.New(),
-		Name: "Jessica",
-	}
+	// Create new update Manager
+	updManager := updater.NewUpdateManager(userAct)
 
-	// Записуємо дані користувача "Alessandro" в базу данних
-	_ = userRepo.NewUser(GamerNoOne)
-	// Записуємо дані користувача "Jessica" в базу данних
-	_ = userRepo.NewUser(GamerNoTwo)
-
-	allUsers, _ := userRepo.GetAllUsers()
-	fmt.Println("All users id DB", allUsers)
-
-	// користувач змінює свої данні
-	GamerNoTwo.Name = "Rebeka"
-	_ = userRepo.UpdateUser(GamerNoTwo)
-
-	// отримати дані користувача за (UUID) унікальним ідентифікатором
-	gamerNoOne, _ := userRepo.GetUserByID(GamerNoOne.ID)
-	fmt.Println("This is user no one", gamerNoOne)
-	gamerNoTwo, _ := userRepo.GetUserByID(GamerNoTwo.ID)
-	fmt.Println("This is user no two", gamerNoTwo)
-
-	// видалення користувача з бази данних
-	//_ = userRepo.DeleteUserByID(GamerNoOne.ID)
-
-	// Дивимось що у нас залишилось в базі після видалення
-	fmt.Println("All users id DB", allUsers)*/
-
-	//var BigButton = tgbotapi.NewReplyKeyboard(
-	//	tgbotapi.NewKeyboardButtonRow(
-	//		tgbotapi.NewKeyboardButton("Click here for help"),
-	//		),
-	//)
-
-
-	bot := api.GetNewBotAPI()
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-		if update.Message.IsCommand() {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-
-			nn := service.NewUseData(userRepo, bot, update, updates, msg)
-			nn.UserInteraction()
-			nn.Register()
-
-		} else {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			bot.Send(msg)
-		}
-
-	}
+	//var useract user.UpdateManager
+	//var uact user.UpdateManager
+	botController.StartWebHookListener(updManager)
 }

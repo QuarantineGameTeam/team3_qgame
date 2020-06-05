@@ -1,4 +1,4 @@
-package config
+package database
 
 /*
 	config repository designed to store data related to presets,
@@ -8,7 +8,6 @@ package config
 
 import (
 	"flag"
-	"log"
 )
 
 type DBConfig struct {
@@ -33,7 +32,4 @@ func (c *DBConfig) InitPgConfig() {
 	flag.StringVar(&c.User, "pg_user", user, "database user name")
 	flag.StringVar(&c.Password, "pg_password", password, "database user password")
 	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
-	flag.Parse()
-	log.Printf("app starts whith database configs:\n host=%s ,\n port=%d ,\n user_name=%s ,\n db_name=%s ;\n",
-		c.Host, c.Port, c.User, c.DBName)
 }
