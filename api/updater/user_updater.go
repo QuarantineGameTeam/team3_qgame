@@ -52,11 +52,13 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CGetAllUsers(update)
 		case "help":
 			u.user.CHelp(update)
-		case "update":
-			u.user.CUpdate(update)
+		case "rename":
+			u.user.CNameUpdate(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
+	} else if update.Message != nil {
+		u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text))
 	}
 }
 
