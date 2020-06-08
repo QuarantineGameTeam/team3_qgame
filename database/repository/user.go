@@ -3,9 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
-
 	"gihub.com/team3_qgame/model"
+	"log"
 )
 
 const (
@@ -14,6 +13,7 @@ const (
 	updateItem  = `UPDATE public.users SET name=$2 /*team=$3 role=$4 health=$5 strength=$6 defence=$7 intellect=$8 level=$9*/ WHERE id=$1;`
 	deleteItem  = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems = `SELECT * FROM public.users;`
+	updateTeam  = `UPDATE public.users SET team=$2 WHERE id=$1;`
 )
 
 type UserRepository struct {
@@ -53,20 +53,13 @@ func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 	return user, nil
 }
 
-//UpdateUser sends a query for updating one User
+//UpdateUser sends a query for updating one User name
 func (p *UserRepository) UpdateUser(user model.User) error {
 	result, err := p.conn.Exec(
 		updateItem,
 		user.ID,
 		user.Name,
-/*		user.Team.String,
-		user.Role.String,
-		user.Health,
-		user.Strength,
-		user.Defence,
-		user.Intellect,
-		user.Level,
-*/	)
+	)
 	if err != nil {
 		return err
 	}
@@ -113,4 +106,21 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 	}
 
 	return users, nil
+}
+
+//UpdateUser sends a query for updating one User team
+func (p *UserRepository) UpdateUserTeam(user model.User) error {
+	result, err := p.conn.Exec(
+		updateTeam,
+		user.ID,
+		user.Team,
+		)
+	if err != nil {
+		return err
+	}
+
+	rowAff, _ := result.RowsAffected()
+	log.Printf("Affected %d rows\n", rowAff)
+
+	return nil
 }
