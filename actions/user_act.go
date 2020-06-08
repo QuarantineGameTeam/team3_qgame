@@ -83,19 +83,32 @@ func (u *User) StartClanSelection(update tgbotapi.Update) {
 		u.bot.Send(msg)
 }
 
-/*func ProcessClanSelection(callbackQuery *telegram.CallbackQuery) {
-	EditMessageReplyMarkup(callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID, nil)
+/*type CallbackQuery struct {
+	ID              string   `json:"id"`
+	From            *User    `json:"from"`
+	Message         *Message `json:"message"`
+	InlineMessageID string   `json:"inline_message_id"`
+	ChatInstance    string   `json:"chat_instance"`
+	Data            string   `json:"data"`
+}*/
+/*type EditMessageReplyMarkup struct {
+	ChatID      int64                 `json:"chat_id"`
+	MessageID   int64                 `json:"message_id"`
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+}
+func (u *User) ProcessClanSelection(update tgbotapi.Update) {
+	EditMessageReplyMarkup(update.Message.Chat.ID, update.Message.MessageID, nil)
 
-	SaveUserClan(callbackQuery)
+	SaveUserClan(update)
 
-	user, err := GetUserFromDB(callbackQuery.From.ID) 
+	user, err := GetUserFromDB(update.From.ID) 
 	if err != nil {
 		log.Println("Could not get user", err)
 	}
 
-	SendMessage(callbackQuery.Message.Chat.ID, "Welcome to " + user.Clan + " clan)", nil)
+	SendMessage(update.Message.Chat.ID, "Welcome to " + user.team + " team)", nil)
 
-	SendStartBattleMessage(callbackQuery)
+	SendStartBattleMessage(update)
 }*/
 
 func (u *User) method3() {}
