@@ -46,7 +46,8 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.MSRegistration(update)
 		case "/information":
 			u.user.MSIformation(update)
-		//case "/plus":
+		case "/plus":
+			u.user.ProcessClanSelection(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
