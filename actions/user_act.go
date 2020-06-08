@@ -1,6 +1,7 @@
 package actions
 
 import (
+	//"log"
 	"gihub.com/team3_qgame/database/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -64,25 +65,25 @@ func (u *User) MSIformation(update tgbotapi.Update) {
 	_, _ = u.bot.Send(msg)
 }
 
-func StartClanSelection(message *telegram.Message) {
-	log.Println("Start clan selection for user ID", message.From.ID)
-
-	replyMarkup := telegram.NewInlineKeyboardMarkup(
-		telegram.NewInlineKeyboardRow(
-			telegram.NewInlineKeyboardButtonData("Clan 1", "CLAN_SELECT_1"),
+func (u *User) StartClanSelection(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Start clan selection for user ID")
+	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Clan 1", "CLAN_SELECT_1"),
 		),
-		telegram.NewInlineKeyboardRow(
-			telegram.NewInlineKeyboardButtonData("Clan 2", "CLAN_SELECT_2"),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Clan 2", "CLAN_SELECT_2"),
 		),
-		telegram.NewInlineKeyboardRow(
-			telegram.NewInlineKeyboardButtonData("Clan 3", "CLAN_SELECT_3"),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Clan 3", "CLAN_SELECT_3"),
 		),
 	)
-
-	SendMessage(message.Chat.ID, "Please select a clan", &replyMarkup)
+	msg.ReplyMarkup = replyMarkup
+	msg.Text = "Please select a clan"
+		u.bot.Send(msg)
 }
 
-func ProcessClanSelection(callbackQuery *telegram.CallbackQuery) {
+/*func ProcessClanSelection(callbackQuery *telegram.CallbackQuery) {
 	EditMessageReplyMarkup(callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID, nil)
 
 	SaveUserClan(callbackQuery)
@@ -95,6 +96,6 @@ func ProcessClanSelection(callbackQuery *telegram.CallbackQuery) {
 	SendMessage(callbackQuery.Message.Chat.ID, "Welcome to " + user.Clan + " clan)", nil)
 
 	SendStartBattleMessage(callbackQuery)
-}
+}*/
 
 func (u *User) method3() {}
