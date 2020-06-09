@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/model"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -17,12 +16,10 @@ const (
 		"\n/changeteam - change or set your team"
 	noTeamString string = "noteam"
 )
-
 type User struct {
 	userRepo *repository.UserRepository
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
-	enemy    *model.User
 }
 
 func NewUser(userRepo *repository.UserRepository) *User {
@@ -55,7 +52,6 @@ func (u *User) CRegistration(update tgbotapi.Update) {
 				_ = u.userRepo.NewUser(userCheck)
 				msg.Text = "Welcome! Your username is " + userCheck.Name
 				u.bot.Send(msg)
-				break
 			}
 		}
 	} else {
@@ -136,22 +132,6 @@ func (u *User) CStartTeamSelection(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
-func (u *User) CStartFightKb(update tgbotapi.Update) {
-
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Chose your team")
-	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!🇺🇦", "Fight"),
-		),
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Назад", "Back"),
-		),
-	)
-
-	msg.ReplyMarkup = &replyMarkup
-	u.bot.Send(msg)
-}
-
 func NewNullString(s string) sql.NullString {
 	if len(s) == 0 {
 		return sql.NullString{}
@@ -187,21 +167,4 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 		}
 	}
 	u.bot.Send(msg)
-}
-
-func (u *User) StartFight(update tgbotapi.Update) {
-	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	msg := tgbotapi.NewMessage(u.enemy.ID, "")
-	//	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
-	for update := range u.updates {
-		if update.CallbackQuery.Data == "Fight" {
-			msg.Text = "Fight started"
-			break
-		} else if update.CallbackQuery.Data == "Back" {
-
-			break
-		}
-	}
-	u.bot.Send(msg)
-	u.bot.Send(msg4u)
 }
