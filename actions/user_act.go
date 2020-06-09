@@ -6,12 +6,12 @@ import (
 )
 
 type User struct {
-	userRepo *repository.UserRepository
+	userRepo *.UserRepository
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
 }
 
-func NewUser(userRepo *repository.UserRepository) *User {
+func NewUser(userRepo *.UserRepository) *User {
 	return &User{
 		userRepo: userRepo,
 	}
