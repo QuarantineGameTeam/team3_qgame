@@ -1,7 +1,8 @@
 package api
 
 import (
-	"gihub.com/team3_qgame/config"
+	"fmt"
+	"gihub.com/team3_qgame/config/bot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"net/http"
@@ -9,17 +10,37 @@ import (
 
 type Bot struct {
 	botAPI *tgbotapi.BotAPI
-	config *config.BotConfig
+	config *bot.BConfig
 }
 
-func NewBot(botConfig *config.BotConfig) *Bot {
+func NewBot(botConfig *bot.BConfig) *Bot {
 	return &Bot{
 		config: botConfig,
 	}
 }
 
-func (b *Bot) NewBotAPI() error {
-	bot, err := tgbotapi.NewBotAPI("1206542464:AAGvkdZzZHo-d-VSbdnk6KOJdgCj4frv9aI")
+func (b *Bot) InitiateBot() error {
+	err := b.newBotAPI()
+	if err != nil {
+		return err
+	}
+
+	_, err = b.setWebHook()
+	if err != nil {
+		return err
+	}
+
+	go b.startBotServer()
+
+	return nil
+}
+
+func (b *Bot) GetBotAPI() *tgbotapi.BotAPI {
+	return b.botAPI
+}
+
+func (b *Bot) newBotAPI() error {
+	bot, err := tgbotapi.NewBotAPI(b.config.Token)
 	if err != nil {
 		return err
 	}
@@ -32,33 +53,15 @@ func (b *Bot) NewBotAPI() error {
 	return nil
 }
 
-func InitBot() {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+func (b *Bot) setWebHook() (tgbotapi.APIResponse, error) {
+	newWebHook := tgbotapi.NewWebhook(b.config.WebHookLink)
+	APIResponse, err := b.botAPI.SetWebhook(newWebHook)
 	if err != nil {
-		log.Fatal(err)
+		return APIResponse, err
 	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	return APIResponse, err
 }
 
-
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	info, err := bot.GetWebhookInfo()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if info.LastErrorDate != 0 {
-		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
-	}
-	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
-
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
+func (b *Bot) startBotServer() {
+	log.Fatalln(http.ListenAndServe(fmt.Sprint(":", b.config.Port), nil))
 }

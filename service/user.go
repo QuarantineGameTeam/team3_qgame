@@ -2,17 +2,18 @@ package service
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"gihub.com/team3_qgame/model"
 )
 
 const (
-	getOneItem  = "SELECT * FROM users WHERE id = $1 Values ;"
-	addOneItem  = "INSERT INTO users (id, name) VALUES ($1, $2)"
-	updateItem  = "UPDATE users SET name=$2 WHERE id=$1;"
-	deleteItem  = "DELETE FROM users WHERE id=$1;"
-	getAllItems = "SELECT * FROM users;"
+	getOneItem  = `SELECT * FROM public.users WHERE id = $1;`
+	addOneItem  = `INSERT INTO public.users (id, name) VALUES ($1, $2);`
+	updateItem  = `UPDATE public.users SET name=$2 WHERE id=$1;`
+	deleteItem  = `DELETE FROM public.users WHERE id=$1;`
+	getAllItems = `SELECT * FROM public.users;`
 )
 
 type UserRepository struct {
@@ -41,9 +42,9 @@ func (p *UserRepository) NewUser(user model.User) error {
 
 //GetUser sends a query for get certain user from DB
 func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
-	user := model.User{}
+	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
-
+	fmt.Println("ROw", row)
 	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil {
 		return user, err

@@ -3,9 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"gihub.com/team3_qgame/config/database"
 	"log"
 
-	"gihub.com/team3_qgame/config"
 	_ "github.com/lib/pq"
 )
 
@@ -21,37 +21,35 @@ import (
 
 type DBConnection struct {
 	dbConnection *sql.DB
-	config       *config.DBConfig
+	config       *database.DBConfig
 }
 
-func NewDBConnection(config *config.DBConfig) *DBConnection {
-	config.InitPgConfig()
-	//fmt.Println(config.InitPgConfig)
+func NewDBConnection(config *database.DBConfig) *DBConnection {
 	return &DBConnection{
 		config: config,
 	}
-
 }
 
-func (d *DBConnection) GetConnection() *sql.DB {
+func (d *DBConnection) GetConnection() (*sql.DB, error) {
+	err := d.connect()
+	if err != nil {
+		return nil, err
+	}
 
-	return d.dbConnection
-
+	return d.dbConnection, nil
 }
 
-func (d *DBConnection) Connect() error {
+func (d *DBConnection) connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		d.config.Host, d.config.Port, d.config.User, d.config.Password, d.config.DBName)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-
 		return err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		
 		return err
 	}
 
