@@ -11,9 +11,11 @@ type BConfig struct {
 }
 
 const (
+
 	token       = "716959869:AAHHXSfUrr87c2ldUyb8G-ZjG4eDwqxO_tQ"
-	webHookLink = "https://7799faf11e1d.ngrok.io"
-	botPort     = 8090
+	webHookLink = "http://be6b44346103.ngrok.io"
+	botPort     = 3000
+
 )
 
 func (b *BConfig) InitBotConfig() {

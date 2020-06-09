@@ -38,25 +38,42 @@ func (u *UpdateManager) SetUpdates(bot *tgbotapi.BotAPI, updates tgbotapi.Update
 }
 
 func (u *UpdateManager) Messages(update tgbotapi.Update) {
-	if update.Message.Text != "" {
-		switch update.Message.Text {
-		case "/start":
-			u.user.MSStart(update)
-		case "/register":
-			u.user.MSRegistration(update)
-		case "/information":
-			u.user.MSIformation(update)
-		case "/plus":
-			u.user.StartClanSelection(update)
-			u.user.ProcessClanSelection(update)
+
+	if update.Message.IsCommand() {
+		switch update.Message.Command() {
+		case "start":
+			u.user.CStart(update)
+		case "register":
+			u.user.CRegistration(update)
+		case "delete":
+			u.user.CDelete(update)
+		case "me":
+			u.user.CGetUserInfo(update)
+		case "allusers":
+			u.user.CGetAllUsers(update)
+		case "help":
+			u.user.CHelp(update)
+		case "rename":
+			u.user.CNameUpdate(update)
+		case "changeteam":
+			u.user.CStartTeamSelection(update)
+			u.user.TeamChange(update)
+		case "startfight":
+			u.user.CStartFightKb(update)
+			u.user.StartFight(update)
+//			u.user.
+
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
+	} else if update.Message != nil {
+		u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text))
 	}
 }
 
 func (u *UpdateManager) CallbackQuery(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "dfasdf")
+
+	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
 	switch update.CallbackQuery.Data {
 	case "4":
 		msg.Text = "You hit the '4' button!"
