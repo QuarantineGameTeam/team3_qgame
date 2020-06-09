@@ -54,6 +54,9 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CHelp(update)
 		case "rename":
 			u.user.CNameUpdate(update)
+		case "changeteam":
+			u.user.CStartTeamSelection(update)
+			u.user.TeamChange(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
@@ -63,6 +66,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 }
 
 func (u *UpdateManager) CallbackQuery(update tgbotapi.Update) {
+
 	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
 	switch update.CallbackQuery.Data {
 	case "4":
