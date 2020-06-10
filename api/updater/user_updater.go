@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"fmt"
 	"gihub.com/team3_qgame/actions"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -57,7 +58,6 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 		case "changeteam":
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
-
 		case "startfight":
 			u.user.CStartFightKb(update)
 			u.user.StartFight(update)
