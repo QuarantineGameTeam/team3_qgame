@@ -18,11 +18,13 @@ const (
 )
 type User struct {
 	userRepo *.UserRepository
+	userRepo *repository.UserRepository
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
 }
 
 func NewUser(userRepo *.UserRepository) *User {
+func NewUser(userRepo *repository.UserRepository) *User {
 	return &User{
 		userRepo: userRepo,
 	}
