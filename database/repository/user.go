@@ -65,6 +65,7 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 		user.Defence,
 		user.Intellect,
 		user.Level,
+		user.Currency,
 	)
 	if err != nil {
 		return err
