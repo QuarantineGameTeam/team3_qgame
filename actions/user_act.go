@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/model"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -17,17 +16,10 @@ const (
 		"\n/changeteam - change or set your team"
 	noTeamString string = "noteam"
 )
-
 type User struct {
 	userRepo *repository.UserRepository
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
-	enemy    *model.User
-}
-
-type Turn struct {
-	param1 float64
-	param2 float64
 }
 
 func NewUser(userRepo *repository.UserRepository) *User {
@@ -60,7 +52,6 @@ func (u *User) CRegistration(update tgbotapi.Update) {
 				_ = u.userRepo.NewUser(userCheck)
 				msg.Text = "Welcome! Your username is " + userCheck.Name
 				u.bot.Send(msg)
-				break
 			}
 		}
 	} else {
@@ -182,6 +173,7 @@ func (u *User) KbDefence(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
+
 func NewNullString(s string) sql.NullString {
 	if len(s) == 0 {
 		return sql.NullString{}
@@ -219,57 +211,3 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 	}
 	u.bot.Send(msg)
 }
-
-func (u *User) StartFight(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "Fight":
-			msg.Text = "Fight started"
-			u.bot.Send(msg)
-		case "Back":
-			msg.Text = "Retreat"
-			u.bot.Send(msg)
-		}
-		break
-	}
-}
-
-func (u *User) AttackCallBack(update tgbotapi.Update) Turn {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
-	var attackerTurn Turn
-	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "strength":
-			attackerTurn = Turn{userCheck.Strength, 0}
-			msg.Text = "Attack with bow 🏹"
-		case "intellect":
-			attackerTurn = Turn{0, userCheck.Intellect}
-			msg.Text = "Attack with rainbow 🏳️‍🌈"
-		}
-		break
-	}
-	u.bot.Send(msg)
-	return attackerTurn
-}
-
-/*func (u *User) DefenceCallBack(update tgbotapi.Update) Turn {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
-	var defenderTurn Turn
-	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "strength":
-			defenderTurn = Turn {userCheck.Defence, 0}
-			msg.Text = "Use Shield"
-			break
-		case "intellect":
-			defenderTurn = Turn {0, userCheck.Defence}
-			msg.Text = "Become invisible"
-			break
-		}
-		u.bot.Send(msg)
-	}
-	return defenderTurn
-}*/
