@@ -9,7 +9,6 @@ CREATE TABLE users
     defence DECIMAL NOT NULL DEFAULT 1,
     intellect DECIMAL NOT NULL DEFAULT 1,
     level DECIMAL NOT NULL DEFAULT 0,
-    PRIMARY KEY (id)
     currency DECIMAL NOT NULL DEFAULT 50,
         PRIMARY KEY (id)
 );
