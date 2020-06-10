@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"fmt"
 	"gihub.com/team3_qgame/actions"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -61,7 +62,8 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CStartFightKb(update)
 			u.user.StartFight(update)
 			u.user.KbAttack(update)
-			u.user.AttackCallBack(update)
+			aturn := u.user.AttackCallBack(update)
+			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("\n%+v", aturn)))
 //			u.user.
 
 		default:
