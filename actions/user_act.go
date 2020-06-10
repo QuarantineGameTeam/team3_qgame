@@ -168,3 +168,36 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 	}
 	u.bot.Send(msg)
 }
+
+func (u *User) CStartFightKb(update tgbotapi.Update) {
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Chose your team")
+	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!🇺🇦", "Fight"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Назад", "Back"),
+		),
+	)
+
+	msg.ReplyMarkup = &replyMarkup
+	u.bot.Send(msg)
+}
+
+func (u *User) StartFight(update tgbotapi.Update) {
+	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	//msg := tgbotapi.NewMessage(u.enemy.ID, "")
+	//	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	for update := range u.updates {
+		if update.CallbackQuery.Data == "Fight" {
+			msg4u.Text = "Fight started"
+			break
+		} else if update.CallbackQuery.Data == "Back" {
+
+			break
+		}
+	}
+	//u.bot.Send(msg)
+	u.bot.Send(msg4u)
+}
