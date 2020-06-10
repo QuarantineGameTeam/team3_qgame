@@ -190,7 +190,8 @@ func (u *User) CStartFightKb(update tgbotapi.Update) {
 
 func (u *User) CStartFightQuestionKB(update tgbotapi.Update) {
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "На вас напали")
+	//msg := tgbotapi.NewMessage(1284900397, "На вас напали")
+	msg := tgbotapi.NewMessage(enemy.ID, "На вас напали")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "FightOk"),
@@ -207,15 +208,12 @@ func (u *User) CStartFightQuestionKB(update tgbotapi.Update) {
 func (u *User) StartFight(update tgbotapi.Update) {
 	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	enemy, _ := u.userRepo.GetRandomUser(update.Message.Chat.ID)
+	//msg := tgbotapi.NewMessage(1284900397, "")
 	msg := tgbotapi.NewMessage(enemy.ID, "")
 	//	, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	for update := range u.updates {
 		if update.CallbackQuery.Data == "Fight" {
 			msg4u.Text = "Wait fight will be start..."
-			msg.Text = "На вас напали"
-			msg4u.Text = "На вас напали"
-			//CStartFightQuestionKB()
-			u.bot.Send(msg)
 			break
 		} else if update.CallbackQuery.Data == "Back" {
 
