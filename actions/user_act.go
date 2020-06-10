@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"gihub.com/team3_qgame/database/repository"
+	"gihub.com/team3_qgame/model"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -20,6 +21,7 @@ type User struct {
 	userRepo *repository.UserRepository
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
+	enemy    *model.User
 }
 
 func NewUser(userRepo *repository.UserRepository) *User {
@@ -52,6 +54,7 @@ func (u *User) CRegistration(update tgbotapi.Update) {
 				_ = u.userRepo.NewUser(userCheck)
 				msg.Text = "Welcome! Your username is " + userCheck.Name
 				u.bot.Send(msg)
+				break
 			}
 		}
 	} else {
@@ -185,19 +188,40 @@ func (u *User) CStartFightKb(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
+func (u *User) CStartFightQuestionKB(update tgbotapi.Update) {
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "На вас напали")
+	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "FightOk"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Втікти", "escape"),
+		),
+	)
+
+	msg.ReplyMarkup = &replyMarkup
+	u.bot.Send(msg)
+}
+
 func (u *User) StartFight(update tgbotapi.Update) {
 	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	//msg := tgbotapi.NewMessage(u.enemy.ID, "")
-	//	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	enemy, _ := u.userRepo.GetRandomUser(update.Message.Chat.ID)
+	msg := tgbotapi.NewMessage(enemy.ID, "")
+	//	, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	for update := range u.updates {
 		if update.CallbackQuery.Data == "Fight" {
-			msg4u.Text = "Fight started"
+			msg4u.Text = "Wait fight will be start..."
+			msg.Text = "На вас напали"
+			msg4u.Text = "На вас напали"
+			//CStartFightQuestionKB()
+			u.bot.Send(msg)
 			break
 		} else if update.CallbackQuery.Data == "Back" {
 
 			break
 		}
 	}
-	//u.bot.Send(msg)
+	u.bot.Send(msg)
 	u.bot.Send(msg4u)
 }

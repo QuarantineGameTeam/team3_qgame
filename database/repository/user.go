@@ -13,7 +13,7 @@ const (
 	updateItem  = `UPDATE public.users SET name=$2, team=$3, role=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9 WHERE id=$1;`
 	deleteItem  = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems = `SELECT * FROM public.users;`
-	getRandomItem = `SELECT * FROM public.users ORDER BY RANDOM() LIMIT 1;`
+	getRandomItem = `SELECT * FROM public.users ORDER BY RANDOM() LIMIT 100;`
 )
 
 type UserRepository struct {
