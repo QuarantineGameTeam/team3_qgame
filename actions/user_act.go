@@ -23,6 +23,7 @@ type User struct {
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
 	enemy    *model.User
+	Turn     Turn
 }
 
 type Turn struct {
@@ -218,6 +219,7 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 		}
 	}
 	u.bot.Send(msg)
+
 }
 
 func (u *User) StartFight(update tgbotapi.Update) {
@@ -239,7 +241,7 @@ func (u *User) StartFight(update tgbotapi.Update) {
 	}
 }
 
-func (u *User) AttackCallBack(update tgbotapi.Update) Turn {
+func (u *User) AttackCallBack(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	var attackerTurn Turn
@@ -255,7 +257,9 @@ func (u *User) AttackCallBack(update tgbotapi.Update) Turn {
 		break
 	}
 	u.bot.Send(msg)
-	return attackerTurn
+	u.Turn = attackerTurn
+	msg.Text = fmt.Sprintf("\n%+v", u.Turn)
+	u.bot.Send(msg)
 }
 
 /*func (u *User) DefenceCallBack(update tgbotapi.Update) Turn {

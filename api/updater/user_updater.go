@@ -62,7 +62,6 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.StartFight(update)
 			u.user.KbAttack(update)
 			u.user.AttackCallBack(update)
-
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
