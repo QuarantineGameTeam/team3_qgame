@@ -221,12 +221,16 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 }
 
 func (u *User) StartFight(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	enemy, _ := u.userRepo.GetRandomUser()
+	msg := tgbotapi.NewMessage(enemy.ID, "")
 	for update := range u.updates {
 		switch update.CallbackQuery.Data {
 		case "Fight":
 			msg.Text = "Fight started"
+			msg4u.Text = "Fight started"
 			u.bot.Send(msg)
+			u.bot.Send(msg4u)
 		case "Back":
 			msg.Text = "Retreat"
 			u.bot.Send(msg)

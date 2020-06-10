@@ -39,10 +39,11 @@ func (p *UserRepository) NewUser(user model.User) error {
 
 	return nil
 }
+
 //GetRandomUser select random user from DB
-func (p *UserRepository) GetRandomUser(id int64) (model.User, error) {
+func (p *UserRepository) GetRandomUser() (model.User, error) {
 	var user model.User
-	row := p.conn.QueryRow(getRandomItem, id)
+	row := p.conn.QueryRow(getRandomItem)
 	fmt.Println("ROw", row)
 	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil {
