@@ -1,35 +1,56 @@
 package database
 
+import (
+	"database/sql"
+	"fmt"
+	"gihub.com/team3_qgame/config/database"
+	"log"
+
+	_ "github.com/lib/pq"
+)
+
 /*
 	config repository designed to store data related to presets,
 	telling the part of the software that is closed from the user,
 	how to proceed in the case specified by the rules.
 */
 
-import (
-	"flag"
-)
-
-type DBConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBName   string
+type DBConnection struct {
+	dbConnection *sql.DB
+	config       *database.DBConfig
 }
 
-const (
-	host     = "localhost"
-	dbPort   = 5432
-	user     = "postgres"
-	password = "team3bot"
-	dbname   = "team3bot"
-)
+func NewDBConnection(config *database.DBConfig) *DBConnection {
+	return &DBConnection{
+		config: config,
+	}
+}
 
-func (c *DBConfig) InitPgConfig() {
-	flag.StringVar(&c.Host, "pg_host", host, "database discovery url")
-	flag.IntVar(&c.Port, "pg_port", dbPort, "database port")
-	flag.StringVar(&c.User, "pg_user", user, "database user name")
-	flag.StringVar(&c.Password, "pg_password", password, "database user password")
-	flag.StringVar(&c.DBName, "pg_dbname", dbname, "name of database")
+func (d *DBConnection) GetConnection() (*sql.DB, error) {
+	err := d.connect()
+	if err != nil {
+		return nil, err
+	}
+
+	return d.dbConnection, nil
+}
+
+func (d *DBConnection) connect() error {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		d.config.Host, d.config.Port, d.config.User, d.config.Password, d.config.DBName)
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		return err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+
+	d.dbConnection = db
+
+	log.Println("Successfully connected!")
+	return nil
 }

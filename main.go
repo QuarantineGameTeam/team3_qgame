@@ -1,96 +1,48 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
-	"rgb/conf"
-	"rgb/db"
-	"strconv"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"gihub.com/team3_qgame/actions"
+	"gihub.com/team3_qgame/api"
+	"gihub.com/team3_qgame/api/controller"
+	"gihub.com/team3_qgame/api/updater"
+	"gihub.com/team3_qgame/config"
+	"gihub.com/team3_qgame/database"
+	"gihub.com/team3_qgame/database/repository"
 )
 
-var (
-	NewBot, BotErr = tgbotapi.NewBotAPI(conf.BOT_TOKEN)
-)
-
-func setWebhook(bot *tgbotapi.BotAPI) {
-	bot.SetWebhook(tgbotapi.NewWebhook(conf.WEB_HOOK))
-}
-
-var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("1", "http://golang.org"),
-		tgbotapi.NewInlineKeyboardButtonSwitch("2", "open 2"),
-		tgbotapi.NewInlineKeyboardButtonData("3", "33"),
-	),
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("4", "4"),
-		tgbotapi.NewInlineKeyboardButtonData("5", "5"),
-		tgbotapi.NewInlineKeyboardButtonData("6", "6"),
-	),
-)
-
-func GetUser(msg *tgbotapi.Message) conf.User {
-	user := conf.User{Id: msg.Chat.ID, FirstName: msg.Chat.FirstName}
-	fmt.Println(user)
-	return user
-}
-
-func getUpdates(bot *tgbotapi.BotAPI) {
-	setWebhook(bot)
-	updates := bot.ListenForWebhook("/")
-	for update := range updates {
-		var user conf.User
-		if update.CallbackQuery != nil {
-
-			fmt.Print(user)
-
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
-			switch update.CallbackQuery.Data {
-			case "4":
-				msg.Text = "You hit the '4' button!"
-			}
-			bot.Send(msg)
-		}
-		if update.Message != nil {
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "<empty>")
-
-			fmt.Println(user)
-
-			if update.Message.Text != "/start" {
-				user = db.GetUser(strconv.Itoa(int(update.Message.Chat.ID)))
-				msg.Text = "Привіт, " + user.FirstName
-			}
-
-			switch update.Message.Text {
-			case "/start":
-				user = GetUser(update.Message)
-				db.SaveUser(&user)
-			case "/me":
-				msg.Text = "Your rank is: 567"
-			case "open":
-				msg.ReplyMarkup = numericKeyboard
-			case "close":
-				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
-			case "plus":
-				user.Counter++
-				db.SaveUser(&user)
-				msg.Text = strconv.Itoa(user.Counter)
-			}
-			bot.Send(msg)
-		}
-		db.SaveUser(&user)
-
-	}
-}
+/*
+	In the main file we collect all function that needed for running app.
+*/
 
 func main() {
-	go func() {
-		log.Fatal(http.ListenAndServe(":"+conf.BOT_PORT, nil))
-	}()
 
-	getUpdates(NewBot)
+	// Initiate program configuration
+	var appConfig config.Config
+	appConfig.InitConfig()
+
+	// Initiate connection to database
+	dbConn := database.NewDBConnection(&appConfig.DBConfig)
+	conn, err := dbConn.GetConnection()
+	if err != nil {
+		log.Println("DB connection failure, error:", err.Error())
+	}
+
+	// Create new instance of user repository
+	userRepo := repository.NewUserRepository(conn)
+
+	// Initiate new bot connection
+	bot := api.NewBot(&appConfig.BotConfig)
+	botController := controller.NewBotController(bot)
+
+	// Initiate new user action instance
+	userAct := actions.NewUser(userRepo)
+
+	// Create new update Manager
+	updManager := updater.NewUpdateManager(userAct)
+
+	//var useract user.UpdateManager
+	//var uact user.UpdateManager
+	botController.StartWebHookListener(updManager)
 }
