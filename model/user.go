@@ -14,9 +14,9 @@ type User struct {
 	Name      string         `json:"name"`
 	Team      sql.NullString `json:"team"`
 	Role      sql.NullString `json:"role"`
-	Health    float32        `json:"health"`
-	Strength  float32        `json:"strength"`
-	Defence   float32        `json:"defence"`
-	Intellect float32        `json:"intellect"`
-	Level     float32        `json:"level"`
+	Health    float64        `json:"health"`
+	Strength  float64        `json:"strength"`
+	Defence   float64        `json:"defence"`
+	Intellect float64        `json:"intellect"`
+	Level     float64        `json:"level"`
 }
