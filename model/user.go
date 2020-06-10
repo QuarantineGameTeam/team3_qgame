@@ -19,4 +19,5 @@ type User struct {
 	Defence   float64        `json:"defence"`
 	Intellect float64        `json:"intellect"`
 	Level     float64        `json:"level"`
+	Currency  int 			`json:"currency"`
 }
