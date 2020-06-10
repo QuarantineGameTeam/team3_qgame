@@ -10,7 +10,7 @@ import (
 const (
 	getOneItem  = `SELECT * FROM public.users WHERE id = $1;`
 	addOneItem  = `INSERT INTO public.users (id, name) VALUES ($1, $2);`
-	updateItem  = `UPDATE public.users SET name=$2, team=$3, role=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9 WHERE id=$1;`
+	updateItem  = `UPDATE public.users SET name=$2, team=$3, role=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9, currency=$10 WHERE id=$1;`
 	deleteItem  = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems = `SELECT * FROM public.users;`
 )
@@ -44,7 +44,7 @@ func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
 	fmt.Println("ROw", row)
-	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level, &user.Currency)
 	if err != nil {
 		return user, err
 	}
