@@ -126,3 +126,15 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 
 	return users, nil
 }
+//Rating sends a query for get user parameters from DB
+func (p *UserRepository) Rating(id int64) (model.User, error) {
+	var user model.User
+	row := p.conn.QueryRow(getOneItem, id)
+	fmt.Println("ROw", row)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}

@@ -64,6 +64,8 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.KbAttack(update)
 			aturn := u.user.AttackCallBack(update)
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("\n%+v", aturn)))
+		case "rating":
+			u.user.Rating(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
