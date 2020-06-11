@@ -5,19 +5,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("1", "http://golang.org"),
-		tgbotapi.NewInlineKeyboardButtonSwitch("2", "open 2"),
-		tgbotapi.NewInlineKeyboardButtonData("3", "33"),
-	),
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("4", "4"),
-		tgbotapi.NewInlineKeyboardButtonData("5", "5"),
-		tgbotapi.NewInlineKeyboardButtonData("6", "6"),
-	),
-)
-
 type UpdateManager struct {
 	bot     *tgbotapi.BotAPI
 	updates tgbotapi.UpdatesChannel
@@ -58,10 +45,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
 		case "startfight":
-			u.user.CStartFightKb(update)
-			u.user.StartFight(update)
-			u.user.KbAttack(update)
-			u.user.AttackCallBack(update)
+			u.user.Fight(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
