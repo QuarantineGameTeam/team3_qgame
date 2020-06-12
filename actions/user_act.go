@@ -181,6 +181,7 @@ func (u *User) KbDefence(chatID int64) {
 			tgbotapi.NewInlineKeyboardButtonData("Defence🔮", "intellect"),
 		),
 	)
+
 	msg.ReplyMarkup = &replyMarkup
 	u.bot.Send(msg)
 }
@@ -221,7 +222,6 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 		}
 	}
 	u.bot.Send(msg)
-
 }
 
 func (u *User) StartFight(update tgbotapi.Update) {
@@ -261,6 +261,18 @@ func (u *User) AttackCallBack(chatID int64) {
 	u.bot.Send(msg)
 	msg.Text = fmt.Sprintf("\n%+v", u.attackersTurn)
 	u.bot.Send(msg)
+}
+
+func (u *User) Rating(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if userCheck.ID == update.Message.Chat.ID {
+		msg.Text = "Your rating:" + fmt.Sprintf("Team %v\n Role %v\n Level %v\n Defence %v\n Health %v\n Intellect %v\n Strength %v\n", userCheck.Team, userCheck.Role, userCheck.Level, userCheck.Defence, userCheck.Health, userCheck.Intellect, userCheck.Strength)
+		u.bot.Send(msg)
+	} else {
+		msg.Text = "You have no user yet"
+		u.bot.Send(msg)
+	}
 }
 
 func (u *User) DefenceCallBack(chatID int64) {
