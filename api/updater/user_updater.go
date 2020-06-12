@@ -2,6 +2,7 @@ package updater
 
 import (
 	"gihub.com/team3_qgame/actions"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 

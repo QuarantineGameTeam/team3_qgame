@@ -3,10 +3,12 @@ package actions
 import (
 	"database/sql"
 	"fmt"
+	"log"
+
 	"gihub.com/team3_qgame/database/repository"
 	"gihub.com/team3_qgame/model"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"log"
 )
 
 const (
