@@ -370,30 +370,30 @@ func (u *User) Fight(update tgbotapi.Update) {
 		// successful attacker STRENGTH hit
 		if strPoint > 0 {
 			defender.Health -= strPoint * mult
-			msgAttaker.Text = fmt.Sprintf( "Your move by STRENGTH succesful. Enemy Helth: -25\n" +
-				"\n STATUS _______" +
+			msgAttaker.Text = fmt.Sprintf("Your move by STRENGTH succesful. Enemy Helth: -25\n"+
+				"\n STATUS _______"+
 				"your health : %v\n"+
 				"enemy health : %v\n",
 				attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n" +
-				"\n STATUS _______" +
+			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n"+
+				"\n STATUS _______"+
 				"your health : %v\n"+
 				"enemy health : %v\n",
 				defender.Health, attacker.Health)
-		// Successful attacker INTELLECT hit
+			// Successful attacker INTELLECT hit
 		} else if intPoint > 0 {
 			defender.Health -= intPoint * mult
-			msgAttaker.Text = fmt.Sprintf( "Your move by INTELLECT succesful. Enemy Helth: -25\n" +
-				"\n STATUS _______" +
+			msgAttaker.Text = fmt.Sprintf("Your move by INTELLECT succesful. Enemy Helth: -25\n"+
+				"\n STATUS _______"+
 				"your health : %v\n"+
 				"enemy health : %v\n",
 				attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n" +
-				"\n STATUS _______" +
+			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n"+
+				"\n STATUS _______"+
 				"your health : %v\n"+
 				"enemy health : %v\n",
 				defender.Health, attacker.Health)
-		//	If Defence is bigger than attacker strength, than attacker get a hit back.
+			//	If Defence is bigger than attacker strength, than attacker get a hit back.
 		} else if u.attackersTurn.param1 > 0 && u.defendersTurn.param1 > u.attackersTurn.param1 {
 			attacker.Health -= (u.defendersTurn.param1 - u.attackersTurn.param1) * mult
 			msgAttaker.Text = fmt.Sprintf("counterattack\n"+
@@ -402,7 +402,7 @@ func (u *User) Fight(update tgbotapi.Update) {
 			msgDeffender.Text = fmt.Sprintf("counterattack\n"+
 				"your health - %v\n"+
 				"enemy health - %v\n", defender.Health, attacker.Health)
-		//	If Defence is bigger than attacker intellect, than attacker get a hit back.
+			//	If Defence is bigger than attacker intellect, than attacker get a hit back.
 		} else if u.attackersTurn.param2 > 0 && u.defendersTurn.param2 > u.attackersTurn.param2 {
 			attacker.Health -= (u.defendersTurn.param2 - u.attackersTurn.param2) * mult
 			msgAttaker.Text = fmt.Sprintf("counterattack\n"+
@@ -411,7 +411,7 @@ func (u *User) Fight(update tgbotapi.Update) {
 			msgDeffender.Text = fmt.Sprintf("counterattack\n"+
 				"your health - %v\n"+
 				"enemy health - %v\n", defender.Health, attacker.Health)
-		// If defence equal attack
+			// If defence equal attack
 		} else {
 			msgAttaker.Text = fmt.Sprintf("protection worked\n"+
 				"your health - %v\n"+
