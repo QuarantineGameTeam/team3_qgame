@@ -22,6 +22,12 @@ type User struct {
 	bot      *tgbotapi.BotAPI
 	updates  tgbotapi.UpdatesChannel
 	enemy    *model.User
+	Turn     Turn
+}
+
+type Turn struct {
+	param1 float64
+	param2 float64
 }
 
 func NewUser(userRepo *repository.UserRepository) *User {
@@ -173,11 +179,10 @@ func (u *User) TeamChange(update tgbotapi.Update) {
 }
 
 func (u *User) CStartFightKb(update tgbotapi.Update) {
-
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Chose your team")
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Are you sure")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!🇺🇦", "Fight"),
+			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "Fight"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Назад", "Back"),
@@ -188,16 +193,25 @@ func (u *User) CStartFightKb(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
-func (u *User) CStartFightQuestionKB(update tgbotapi.Update) {
-
-	//msg := tgbotapi.NewMessage(1284900397, "На вас напали")
-	msg := tgbotapi.NewMessage(enemy.ID, "На вас напали")
+func (u *User) KbAttack(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Attack")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "FightOk"),
+			tgbotapi.NewInlineKeyboardButtonData("Attack⚔️", "strength"),
+			tgbotapi.NewInlineKeyboardButtonData("Attack💫", "intellect"),
 		),
+	)
+
+	msg.ReplyMarkup = &replyMarkup
+	u.bot.Send(msg)
+}
+
+func (u *User) KbDefence(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(u.enemy.ID, "Defence")
+	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Втікти", "escape"),
+			tgbotapi.NewInlineKeyboardButtonData("Defence🛡", "strength"),
+			tgbotapi.NewInlineKeyboardButtonData("Defence🔮", "intellect"),
 		),
 	)
 
@@ -207,19 +221,40 @@ func (u *User) CStartFightQuestionKB(update tgbotapi.Update) {
 
 func (u *User) StartFight(update tgbotapi.Update) {
 	msg4u := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	enemy, _ := u.userRepo.GetRandomUser(update.Message.Chat.ID)
-	//msg := tgbotapi.NewMessage(1284900397, "")
+	enemy, _ := u.userRepo.GetRandomUser()
 	msg := tgbotapi.NewMessage(enemy.ID, "")
-	//	, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	for update := range u.updates {
-		if update.CallbackQuery.Data == "Fight" {
-			msg4u.Text = "Wait fight will be start..."
-			break
-		} else if update.CallbackQuery.Data == "Back" {
-
-			break
+		switch update.CallbackQuery.Data {
+		case "Fight":
+			msg.Text = "Fight started"
+			msg4u.Text = "Fight started"
+			u.bot.Send(msg)
+			u.bot.Send(msg4u)
+		case "Back":
+			msg.Text = "Retreat"
+			u.bot.Send(msg)
 		}
+		break
+	}
+}
+
+func (u *User) AttackCallBack(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	var attackerTurn Turn
+	for update := range u.updates {
+		switch update.CallbackQuery.Data {
+		case "strength":
+			attackerTurn = Turn{userCheck.Strength, 0}
+			msg.Text = "Attack with bow 🏹"
+		case "intellect":
+			attackerTurn = Turn{0, userCheck.Intellect}
+			msg.Text = "Attack with rainbow 🏳️‍🌈"
+		}
+		break
 	}
 	u.bot.Send(msg)
-	u.bot.Send(msg4u)
+	u.Turn = attackerTurn
+	msg.Text = fmt.Sprintf("\n%+v", u.Turn)
+	u.bot.Send(msg)
 }
