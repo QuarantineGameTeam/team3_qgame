@@ -1,22 +1,9 @@
 package updater
 
 import (
-	"fmt"
 	"gihub.com/team3_qgame/actions"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-)
 
-var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("1", "http://golang.org"),
-		tgbotapi.NewInlineKeyboardButtonSwitch("2", "open 2"),
-		tgbotapi.NewInlineKeyboardButtonData("3", "33"),
-	),
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("4", "4"),
-		tgbotapi.NewInlineKeyboardButtonData("5", "5"),
-		tgbotapi.NewInlineKeyboardButtonData("6", "6"),
-	),
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type UpdateManager struct {
@@ -59,11 +46,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
 		case "startfight":
-			u.user.CStartFightKb(update)
-			u.user.StartFight(update)
-			u.user.KbAttack(update)
-			aturn := u.user.AttackCallBack(update)
-			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("\n%+v", aturn)))
+			u.user.Fight(update)
 		case "rating":
 			u.user.Rating(update)
 		default:
