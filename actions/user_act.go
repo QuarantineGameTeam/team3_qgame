@@ -293,8 +293,6 @@ func (u *User) attackCallBack(chatID int64) {
 		break
 	}
 	u.bot.Send(msg)
-	//msg.Text = fmt.Sprintf("\n%+v", u.attackersTurn)
-	//u.bot.Send(msg)
 }
 
 func (u *User) Rating(update tgbotapi.Update) {
@@ -340,8 +338,6 @@ func (u *User) defenceCallBack(chatID int64) {
 		break
 	}
 	u.bot.Send(msg)
-	//msg.Text = fmt.Sprintf("\n%+v", u.defendersTurn)
-	//u.bot.Send(msg)
 }
 
 func clear(v interface{}) {
