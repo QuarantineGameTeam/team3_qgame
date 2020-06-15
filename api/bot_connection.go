@@ -48,8 +48,8 @@ func (b *Bot) newBotAPI() error {
 	bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
-
 	b.botAPI = bot
+
 	return nil
 }
 

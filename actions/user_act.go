@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
 
 	"gihub.com/team3_qgame/database/repository"
 	"gihub.com/team3_qgame/model"
@@ -244,6 +245,14 @@ func (u *User) startFight(update tgbotapi.Update) {
 		msgUser = tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	)
 
+	u.user, err = u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if err != nil {
+		//msg.Text = "Internal server error"
+		//log.Println("GetUserByID Err:", err)
+		//u.bot.Send(msg)
+		return
+	}
+
 	u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
 	if err != nil {
 		//msg.Text = "Internal server error"
@@ -253,14 +262,6 @@ func (u *User) startFight(update tgbotapi.Update) {
 	}
 
 	msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
-
-	u.user, err = u.userRepo.GetUserByID(update.Message.Chat.ID)
-	if err != nil {
-		//msg.Text = "Internal server error"
-		//log.Println("GetUserByID Err:", err)
-		//u.bot.Send(msg)
-		return
-	}
 
 	for update := range u.updates {
 		switch update.CallbackQuery.Data {
@@ -291,8 +292,6 @@ func (u *User) attackCallBack(chatID int64) {
 		}
 		break
 	}
-	u.bot.Send(msg)
-	msg.Text = fmt.Sprintf("\n%+v", u.attackersTurn)
 	u.bot.Send(msg)
 }
 
@@ -339,8 +338,11 @@ func (u *User) defenceCallBack(chatID int64) {
 		break
 	}
 	u.bot.Send(msg)
-	msg.Text = fmt.Sprintf("\n%+v", u.defendersTurn)
-	u.bot.Send(msg)
+}
+
+func clear(v interface{}) {
+	p := reflect.ValueOf(v).Elem()
+	p.Set(reflect.Zero(p.Type()))
 }
 
 func (u *User) Fight(update tgbotapi.Update) {
@@ -350,14 +352,16 @@ func (u *User) Fight(update tgbotapi.Update) {
 	attacker := u.user
 	defender := u.enemy
 
-	msgAttaker := tgbotapi.NewMessage(attacker.ID, "")
-	msgDeffender := tgbotapi.NewMessage(defender.ID, "")
+	var damage float64
+
+	var strPoint float64
+	var intPoint float64
 
 	// fight loop
 	for true {
 
-		var strPoint float64
-		var intPoint float64
+		msgAttaker := tgbotapi.NewMessage(attacker.ID, "")
+		msgDeffender := tgbotapi.NewMessage(defender.ID, "")
 
 		u.kbAttack(attacker.ID)
 		u.attackCallBack(attacker.ID)
@@ -371,56 +375,66 @@ func (u *User) Fight(update tgbotapi.Update) {
 		// player move result
 		// successful attacker STRENGTH hit
 		if strPoint > 0 {
-			defender.Health -= strPoint * mult
-			msgAttaker.Text = fmt.Sprintf("Your move by STRENGTH succesful. Enemy Helth: -25\n"+
-				"\n STATUS _______"+
-				"your health : %v\n"+
-				"enemy health : %v\n",
-				attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n"+
-				"\n STATUS _______"+
-				"your health : %v\n"+
-				"enemy health : %v\n",
-				defender.Health, attacker.Health)
+			damage = strPoint * mult
+			defender.Health -= damage
+			msgAttaker.Text = fmt.Sprintf("You deal %v physical damage.\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, attacker.Health, defender.Health)
+			msgDeffender.Text = fmt.Sprintf("You receive %v physical damage.\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, defender.Health, attacker.Health)
 			// Successful attacker INTELLECT hit
 		} else if intPoint > 0 {
-			defender.Health -= intPoint * mult
-			msgAttaker.Text = fmt.Sprintf("Your move by INTELLECT succesful. Enemy Helth: -25\n"+
-				"\n STATUS _______"+
-				"your health : %v\n"+
-				"enemy health : %v\n",
-				attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("your defence in unsuccessful. Your Helth: -25\n"+
-				"\n STATUS _______"+
-				"your health : %v\n"+
-				"enemy health : %v\n",
-				defender.Health, attacker.Health)
+			damage = intPoint * mult
+			defender.Health -= damage
+			msgAttaker.Text = fmt.Sprintf("You deal %v magic damage.\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, attacker.Health, defender.Health)
+			msgDeffender.Text = fmt.Sprintf("You receive %v magic damage.\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, defender.Health, attacker.Health)
 			//	If Defence is bigger than attacker strength, than attacker get a hit back.
-		} else if u.attackersTurn.param1 > 0 && u.defendersTurn.param1 > u.attackersTurn.param1 {
-			attacker.Health -= (u.defendersTurn.param1 - u.attackersTurn.param1) * mult
-			msgAttaker.Text = fmt.Sprintf("counterattack\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("counterattack\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", defender.Health, attacker.Health)
+		} else if strPoint < 0 {
+			damage = -strPoint * mult
+			attacker.Health -= damage
+			msgAttaker.Text = fmt.Sprintf("Unsuccessful attack\n" +
+				"Counterattack! You receive %v damage\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, attacker.Health, defender.Health)
+			msgDeffender.Text = fmt.Sprintf("Defence successful\n" +
+				"Counterattack! You deal %v damage\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, defender.Health, attacker.Health)
 			//	If Defence is bigger than attacker intellect, than attacker get a hit back.
-		} else if u.attackersTurn.param2 > 0 && u.defendersTurn.param2 > u.attackersTurn.param2 {
-			attacker.Health -= (u.defendersTurn.param2 - u.attackersTurn.param2) * mult
-			msgAttaker.Text = fmt.Sprintf("counterattack\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", attacker.Health, defender.Health)
-			msgDeffender.Text = fmt.Sprintf("counterattack\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", defender.Health, attacker.Health)
+		} else if intPoint < 0 {
+			damage = -intPoint * mult
+			attacker.Health -= damage
+			msgAttaker.Text = fmt.Sprintf("Unsuccessful attack\n" +
+				"Counterattack! You receive %v damage\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, attacker.Health, defender.Health)
+			msgDeffender.Text = fmt.Sprintf("Defence successful\n" +
+				"Counterattack! You deal %v damage\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				damage, defender.Health, attacker.Health)
 			// If defence equal attack
 		} else {
-			msgAttaker.Text = fmt.Sprintf("protection worked\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", defender.Health, attacker.Health)
-			msgDeffender.Text = fmt.Sprintf("protection worked\n"+
-				"your health - %v\n"+
-				"enemy health - %v\n", attacker.Health, defender.Health)
+			msgAttaker.Text = fmt.Sprintf("Protection worked\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				attacker.Health, defender.Health)
+			msgDeffender.Text = fmt.Sprintf("Protection worked\n"+
+				"\n❤️ : %v\n"+
+				"💙 : %v\n",
+				defender.Health, attacker.Health)
 		}
 
 		u.bot.Send(msgAttaker)
@@ -428,7 +442,7 @@ func (u *User) Fight(update tgbotapi.Update) {
 
 		// Check who win
 		if attacker.Health < 1 || defender.Health < 1 {
-			switch attacker.Health > defender.Health {
+						switch attacker.Health > defender.Health {
 			case true:
 				msgAttaker.Text = "You won"
 				msgDeffender.Text = "You lose"
@@ -439,6 +453,8 @@ func (u *User) Fight(update tgbotapi.Update) {
 			}
 			u.bot.Send(msgAttaker)
 			u.bot.Send(msgDeffender)
+			//clear(u.user)
+			//clear(u.enemy)
 			break
 		}
 
@@ -446,3 +462,4 @@ func (u *User) Fight(update tgbotapi.Update) {
 		attacker, defender = defender, attacker
 	}
 }
+

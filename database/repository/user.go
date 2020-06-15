@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"gihub.com/team3_qgame/model"
 	"log"
 )
@@ -128,6 +129,7 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 
 	return users, nil
 }
+
 //Rating sends a query for get user parameters from DB
 func (p *UserRepository) Rating(id int64) (model.User, error) {
 	var user model.User
