@@ -10,10 +10,10 @@ import (
 const (
 	getOneItem    = `SELECT * FROM public.users WHERE id = $1;`
 	addOneItem    = `INSERT INTO public.users (id, name) VALUES ($1, $2);`
-	updateItem    = `UPDATE public.users SET name=$2, team=$3, role=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9 WHERE id=$1;`
+	updateItem    = `UPDATE public.users SET name=$2, team=$3, status=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9 WHERE id=$1;`
 	deleteItem    = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems   = `SELECT * FROM public.users;`
-	getRandomItem = `SELECT * FROM public.users WHERE NOT id = $1 ORDER BY RANDOM() LIMIT 1;`
+	getRandomItem = `SELECT * FROM public.users WHERE NOT id = $1 AND NOT status = TRUE ORDER BY RANDOM() LIMIT 1;`
 )
 
 type UserRepository struct {
@@ -44,7 +44,7 @@ func (p *UserRepository) NewUser(user model.User) error {
 func (p *UserRepository) GetRandomUser(userID int64) (model.User, error) {
 	var user model.User
 	row := p.conn.QueryRow(getRandomItem, userID)
-	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Status, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user, nil
 	} else if err != nil {
@@ -58,7 +58,7 @@ func (p *UserRepository) GetRandomUser(userID int64) (model.User, error) {
 func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
-	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Status, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		return user, nil
 	} else if err != nil {
@@ -75,7 +75,7 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 		user.ID,
 		user.Name,
 		user.Team,
-		user.Role,
+		user.Status,
 		user.Health,
 		user.Strength,
 		user.Defence,
@@ -115,7 +115,7 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 	users := make([]model.User, 0)
 	for rows.Next() {
 		u := model.User{}
-		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Role, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level)
+		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Status, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level)
 		if err != nil {
 			log.Println("Error:", err.Error())
 		}
@@ -135,7 +135,7 @@ func (p *UserRepository) Rating(id int64) (model.User, error) {
 	var user model.User
 	row := p.conn.QueryRow(getOneItem, id)
 	fmt.Println("ROw", row)
-	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
+	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Status, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
 	if err != nil {
 		return user, err
 	}
