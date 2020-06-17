@@ -2,8 +2,10 @@ package updater
 
 import (
 	"gihub.com/team3_qgame/actions"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
+
 type UpdateManager struct {
 	bot     *tgbotapi.BotAPI
 	updates tgbotapi.UpdatesChannel
@@ -44,10 +46,9 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
 		case "startfight":
-			u.user.CStartFightKb(update)
-			u.user.StartFight(update)
-			u.user.KbAttack(update)
-			u.user.AttackCallBack(update)
+			u.user.Fight(update)
+		case "rating":
+			u.user.Rating(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
