@@ -252,7 +252,7 @@ func (u *User) startFight(update tgbotapi.Update) {
 		//u.bot.Send(msg)
 		return
 	}
-
+	
 	u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
 	if err != nil {
 		//msg.Text = "Internal server error"
@@ -462,4 +462,3 @@ func (u *User) Fight(update tgbotapi.Update) {
 		attacker, defender = defender, attacker
 	}
 }
-

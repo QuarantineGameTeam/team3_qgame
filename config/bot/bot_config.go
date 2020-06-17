@@ -12,7 +12,7 @@ type BConfig struct {
 
 const (
 	token       = "716959869:AAHHXSfUrr87c2ldUyb8G-ZjG4eDwqxO_tQ"
-	webHookLink = "https://a9af4f3912e2.ngrok.io"
+	webHookLink = "https://9287c6fd22a4.ngrok.io"
 	botPort     = 8443
 )
 

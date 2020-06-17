@@ -39,21 +39,6 @@ func (p *UserRepository) NewUser(user model.User) error {
 
 	return nil
 }
-
-//GetRandomUser select random user from DB
-func (p *UserRepository) GetRandomUser(userID int64) (model.User, error) {
-	var user model.User
-	row := p.conn.QueryRow(getRandomItem, userID)
-	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
-	if err != nil && err.Error() == "sql: no rows in result set" {
-		return user, nil
-	} else if err != nil {
-		return user, err
-	}
-
-	return user, nil
-}
-
 //GetUser sends a query for get certain user from DB
 func (p *UserRepository) GetUserByID(id int64) (model.User, error) {
 	var user model.User
@@ -92,18 +77,19 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 	return nil
 }
 //GetRandomUser select random user from DB
-func (p *UserRepository) GetRandomUser() (model.User, error) {
+func (p *UserRepository) GetRandomUser(userID int64) (model.User, error) {
 	var user model.User
-	row := p.conn.QueryRow(getRandomItem)
-	fmt.Println("ROw", row)
+	row := p.conn.QueryRow(getRandomItem, userID)
 	err := row.Scan(&user.ID, &user.Name, &user.Team, &user.Role, &user.Health, &user.Strength, &user.Defence, &user.Intellect, &user.Level)
-	if err != nil {
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		return user, nil
+	} else if err != nil {
 		return user, err
 	}
 
 	return user, nil
 }
-//DeleteUser sends a query for deleting one User by ID
+//DeleteUser sends a query for deleting one User by ID  
 func (p *UserRepository) DeleteUserByID(id int64) error {
 	result, err := p.conn.Exec(deleteItem, id)
 	if err != nil {
