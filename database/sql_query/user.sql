@@ -9,5 +9,8 @@ CREATE TABLE users
     defence   DECIMAL NOT NULL DEFAULT 1,
     intellect DECIMAL NOT NULL DEFAULT 1,
     level     DECIMAL NOT NULL DEFAULT 0,
+    inventory varchar(20)[],
     PRIMARY KEY (id)
 );
+
+
