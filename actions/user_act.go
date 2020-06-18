@@ -233,8 +233,8 @@ func (u *User) Rating(update tgbotapi.Update) {
 	}
 }
 
-func (u *User) startFightKb(update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Are you sure")
+func (u *User) startFightKb(ChatID int64) {
+	msg := tgbotapi.NewMessage(ChatID, "Are you sure")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "Fight"),
@@ -274,46 +274,6 @@ func (u *User) kbDefence(chatID int64) {
 	u.bot.Send(msg)
 }
 
-func (u *User) startFight(update tgbotapi.Update) {
-	var (
-		err error
-
-		msgUser = tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	)
-
-	u.user, err = u.userRepo.GetUserByID(update.Message.Chat.ID)
-	if err != nil {
-		//msg.Text = "Internal server error"
-		//log.Println("GetUserByID Err:", err)
-		//u.bot.Send(msg)
-		return
-	}
-
-	u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
-	if err != nil {
-		//msg.Text = "Internal server error"
-		//log.Println("GetRandomUser Err:", err)
-		//u.bot.Send(msg)
-		return
-	}
-
-	msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
-
-	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "Fight":
-			msgEnemy.Text = "Fight started"
-			msgUser.Text = "Fight started"
-			u.bot.Send(msgEnemy)
-			u.bot.Send(msgUser)
-		case "Back":
-			msgEnemy.Text = "Retreat"
-			u.bot.Send(msgEnemy)
-		}
-		break
-	}
-}
-
 func (u *User) attackCallBack(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "")
 	userCheck, _ := u.userRepo.GetUserByID(chatID)
@@ -350,8 +310,55 @@ func (u *User) defenceCallBack(chatID int64) {
 
 func (u *User) Fight(update tgbotapi.Update) {
 
-	u.startFightKb(update)
-	u.startFight(update)
+	var (
+		err     error
+		msgUser = tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	)
+
+	u.user, err = u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if err != nil {
+		//msg.Text = "Internal server error"
+		//log.Println("GetUserByID Err:", err)
+		//u.bot.Send(msg)
+		return
+	}
+
+	u.startFightKb(u.user.ID)
+
+	for update := range u.updates {
+		switch update.CallbackQuery.Data {
+		case "Fight":
+			msgUser.Text = "Searching for the enemy ..."
+			u.bot.Send(msgUser)
+			findEnemy := false
+			for findEnemy == false {
+				u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
+				if err != nil {
+					log.Println("GetRandomUser Err:", err)
+					return
+				}
+				msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
+				u.startFightKb(u.enemy.ID)
+				for update := range u.updates {
+					switch update.CallbackQuery.Data {
+					case "Fight":
+						findEnemy = true
+						msgEnemy.Text = "Fight started"
+						u.bot.Send(msgEnemy)
+					case "Back":
+						msgEnemy.Text = "Retreat"
+						u.bot.Send(msgEnemy)
+					}
+					break
+				}
+			}
+		case "Back":
+			msgUser.Text = "Retreat"
+			u.bot.Send(msgUser)
+			return
+		}
+		break
+	}
 
 	u.SwitchStatus(u.user.ID)
 	u.SwitchStatus(u.enemy.ID)
