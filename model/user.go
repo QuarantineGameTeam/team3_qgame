@@ -13,7 +13,7 @@ type User struct {
 	ID        int64          `json:"id"`
 	Name      string         `json:"name"`
 	Team      sql.NullString `json:"team"`
-	Role      sql.NullString `json:"role"`
+	Status    bool           `json:"role"`
 	Health    float64        `json:"health"`
 	Strength  float64        `json:"strength"`
 	Defence   float64        `json:"defence"`
