@@ -46,7 +46,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
 		case "startfight":
-			u.user.StartFight(update)
+			//u.user.StartFight(update)
 			u.user.Fight(update)
 		case "rating":
 			u.user.Rating(update)
