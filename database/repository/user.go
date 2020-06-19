@@ -81,6 +81,7 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 		user.Defence,
 		user.Intellect,
 		user.Level,
+		user.Currency,
 	)
 	if err != nil {
 		return err
@@ -115,7 +116,7 @@ func (p *UserRepository) GetAllUsers() ([]model.User, error) {
 	users := make([]model.User, 0)
 	for rows.Next() {
 		u := model.User{}
-		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Status, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level)
+		err := rows.Scan(&u.ID, &u.Name, &u.Team, &u.Health, &u.Strength, &u.Defence, &u.Intellect, &u.Level, &u.Currency)
 		if err != nil {
 			log.Println("Error:", err.Error())
 		}

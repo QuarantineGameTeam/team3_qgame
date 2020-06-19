@@ -50,6 +50,8 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 			u.user.Fight(update)
 		case "rating":
 			u.user.Rating(update)
+		case "buysell":
+			u.user.CBuySell(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}
