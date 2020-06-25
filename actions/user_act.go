@@ -103,6 +103,18 @@ func (u *User) CGetUserInfo(update tgbotapi.Update) {
 	}
 }
 
+func (u *User) CBuySell(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if userCheck.ID == update.Message.Chat.ID {
+		msg.Text = "Your currency:" + fmt.Sprintf("\n%+v", userCheck.Currency)
+		u.bot.Send(msg)
+	} else {
+		msg.Text = "You have no currency"
+		u.bot.Send(msg)
+	}
+}
+
 func (u *User) CGetAllUsers(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	allUsers, _ := u.userRepo.GetAllUsers()
