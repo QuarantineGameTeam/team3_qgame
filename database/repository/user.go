@@ -93,7 +93,7 @@ func (p *UserRepository) UpdateUser(user model.User) error {
 	return nil
 }
 
-//DeleteUser sends a query for deleting one User by ID  
+//DeleteUser sends a query for deleting one User by ID
 func (p *UserRepository) DeleteUserByID(id int64) error {
 	result, err := p.conn.Exec(deleteItem, id)
 	if err != nil {

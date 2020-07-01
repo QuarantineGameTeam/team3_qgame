@@ -12,7 +12,7 @@ type UpdateManager struct {
 	user    *actions.User
 }
 
-func NewUpdateManager(user *actions.User) *UpdateManager {
+func NewUserUpdate(user *actions.User) *UpdateManager {
 	return &UpdateManager{
 		user: user,
 	}
@@ -45,8 +45,6 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 		case "changeteam":
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
-		case "startfight":
-			u.user.Fight(update)
 		case "rating":
 			u.user.Rating(update)
 		case "buysell":

@@ -20,23 +20,14 @@ const (
 		"\n/changeteam - change or set your team" +
 		"\n/rating - get my game rating" +
 		"\n/startfight - lets start the fight "
-	noTeamString string  = "noteam"
-	mult         float64 = 25
+	noTeamString string = "noteam"
 )
 
 type User struct {
-	userRepo      *repository.UserRepository
-	bot           *tgbotapi.BotAPI
-	updates       tgbotapi.UpdatesChannel
-	user          model.User
-	enemy         model.User
-	attackersTurn Turn
-	defendersTurn Turn
-}
-
-type Turn struct {
-	param1 float64
-	param2 float64
+	userRepo *repository.UserRepository
+	bot      *tgbotapi.BotAPI
+	updates  tgbotapi.UpdatesChannel
+	user     model.User
 }
 
 func NewUser(userRepo *repository.UserRepository) *User {
@@ -245,11 +236,11 @@ func (u *User) Rating(update tgbotapi.Update) {
 	}
 }
 
-func (u *User) startFightKb(ChatID int64) {
+func (u *User) startUserKb(ChatID int64) {
 	msg := tgbotapi.NewMessage(ChatID, "Are you sure")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "Fight"),
+			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "User"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Назад", "Back"),
@@ -284,234 +275,4 @@ func (u *User) kbDefence(chatID int64) {
 
 	msg.ReplyMarkup = &replyMarkup
 	u.bot.Send(msg)
-}
-
-func (u *User) attackCallBack(chatID int64) {
-	msg := tgbotapi.NewMessage(chatID, "")
-	userCheck, _ := u.userRepo.GetUserByID(chatID)
-	for update := range u.updates {
-		if update.Message != nil {
-			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == chatID {
-			switch update.CallbackQuery.Data {
-			case "strength":
-				u.attackersTurn = Turn{userCheck.Strength, 0}
-				msg.Text = "Attack with bow 🏹"
-			case "intellect":
-				u.attackersTurn = Turn{0, userCheck.Intellect}
-				msg.Text = "Attack with rainbow 🏳️‍🌈"
-			}
-			break
-		} else {
-			continue
-		}
-	}
-	u.bot.Send(msg)
-}
-
-func (u *User) defenceCallBack(chatID int64) {
-	msg := tgbotapi.NewMessage(chatID, "")
-	userCheck, _ := u.userRepo.GetUserByID(chatID)
-	for update := range u.updates {
-		if update.Message != nil {
-			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == chatID {
-			switch update.CallbackQuery.Data {
-			case "strength":
-				u.defendersTurn = Turn{userCheck.Defence, 0}
-				msg.Text = "Use shield"
-			case "intellect":
-				u.defendersTurn = Turn{0, userCheck.Defence}
-				msg.Text = "Use magic shield"
-			}
-			break
-		} else {
-			continue
-		}
-	}
-	u.bot.Send(msg)
-}
-
-func (u *User) Fight(update tgbotapi.Update) {
-
-	var (
-		err     error
-		msgUser = tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	)
-
-	u.user, err = u.userRepo.GetUserByID(update.Message.Chat.ID)
-	if err != nil {
-		//msg.Text = "Internal server error"
-		//log.Println("GetUserByID Err:", err)
-		//u.bot.Send(msg)
-		return
-	}
-
-	u.startFightKb(u.user.ID)
-
-	for update := range u.updates {
-		if update.Message != nil {
-			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == u.user.ID {
-			switch update.CallbackQuery.Data {
-			case "Fight":
-				msgUser.Text = "Searching for the enemy ..."
-				u.bot.Send(msgUser)
-				findEnemy := false
-				for findEnemy == false {
-					u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
-					if err != nil {
-						log.Println("GetRandomUser Err:", err)
-						return
-					}
-					msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
-					u.startFightKb(u.enemy.ID)
-					for update := range u.updates {
-						if update.Message != nil {
-							continue
-						}
-						if update.CallbackQuery.Message.Chat.ID == u.enemy.ID {
-							switch update.CallbackQuery.Data {
-							case "Fight":
-								findEnemy = true
-								msgEnemy.Text = "Fight started"
-								u.bot.Send(msgEnemy)
-							case "Back":
-								msgEnemy.Text = "Retreat"
-								u.bot.Send(msgEnemy)
-							}
-							break
-						} else {
-							continue
-						}
-					}
-				}
-			case "Back":
-				msgUser.Text = "Retreat"
-				u.bot.Send(msgUser)
-				return
-			}
-			break
-		} else {
-			continue
-		}
-	}
-	u.SwitchStatus(u.user.ID)
-	u.SwitchStatus(u.enemy.ID)
-
-	attacker := u.user
-	defender := u.enemy
-
-	var damage float64
-
-	var strPoint float64
-	var intPoint float64
-
-	var msgAttaker tgbotapi.MessageConfig
-	var msgDefender tgbotapi.MessageConfig
-
-	// fight loop
-	for true {
-
-		msgAttaker = tgbotapi.NewMessage(attacker.ID, "")
-		msgDefender = tgbotapi.NewMessage(defender.ID, "")
-
-		u.kbAttack(attacker.ID)
-		u.attackCallBack(attacker.ID)
-		u.kbDefence(defender.ID)
-		u.defenceCallBack(defender.ID)
-
-		// the player move calculation
-		strPoint = u.attackersTurn.param1 - u.defendersTurn.param1
-		intPoint = u.attackersTurn.param2 - u.defendersTurn.param2
-
-		// player move result
-		// successful attacker STRENGTH hit
-		if strPoint > 0 {
-			damage = strPoint * mult
-			defender.Health -= damage
-			msgAttaker, msgDefender = fightMsg(attacker, defender, damage, succesAtt, unsuccsesDef)
-			// Successful attacker INTELLECT hit
-		} else if intPoint > 0 {
-			damage = intPoint * mult
-			defender.Health -= damage
-			msgAttaker, msgDefender = fightMsg(attacker, defender, damage, succesAtt, unsuccsesDef)
-			//	If Defence is bigger than attacker strength, than attacker get a hit back.
-		} else if strPoint < 0 {
-			damage = -strPoint * mult
-			attacker.Health -= damage
-			msgAttaker, msgDefender = fightMsg(attacker, defender, damage, counterAtt, counterDef)
-			//	If Defence is bigger than attacker intellect, than attacker get a hit back.
-		} else if intPoint < 0 {
-			damage = -intPoint * mult
-			attacker.Health -= damage
-			msgAttaker, msgDefender = fightMsg(attacker, defender, damage, counterAtt, counterDef)
-			// If defence equal attack
-		} else {
-			damage = 0
-			msgAttaker, msgDefender = fightMsg(attacker, defender, damage, unsuccsesAtt, succesDef)
-		}
-
-		u.bot.Send(msgAttaker)
-		u.bot.Send(msgDefender)
-
-		// Check who win
-		if attacker.Health < 1 || defender.Health < 1 {
-			switch attacker.Health > defender.Health {
-			case true:
-				msgAttaker.Text = "You won"
-				msgDefender.Text = "You lose"
-			case false:
-				msgDefender.Text = "You won"
-				msgAttaker.Text = "You lose"
-
-			}
-			u.bot.Send(msgAttaker)
-			u.bot.Send(msgDefender)
-
-			break
-		}
-
-		// next player move
-		attacker, defender = defender, attacker
-	}
-
-	u.SwitchStatus(u.user.ID)
-	u.SwitchStatus(u.enemy.ID)
-}
-
-const (
-	succesAtt    = "Attack successful\nYou deal "
-	unsuccsesAtt = "Unsuccessful attack\nYou deal "
-	succesDef    = "Defence successful\nYou receive "
-	unsuccsesDef = "Unsuccessful defence\nYou receive "
-	counterAtt   = "Unsuccessful attack\nCounterattack! You receive "
-	counterDef   = "Defence successful\nCounterattack! You deal "
-)
-
-func fightMsg(
-	attacker model.User,
-	defender model.User,
-	damage float64,
-	msgAtt string,
-	msgDef string) (
-	msgAttacker tgbotapi.MessageConfig,
-	msgDefender tgbotapi.MessageConfig,
-) {
-
-	msgAttacker = tgbotapi.NewMessage(attacker.ID, "")
-	msgDefender = tgbotapi.NewMessage(defender.ID, "")
-
-	msgAttacker.Text = fmt.Sprintf(msgAtt+"%v damage\n"+
-		"\nYour  ❤️ : %v\n"+
-		"Enemy 💙 : %v\n",
-		damage, attacker.Health, defender.Health)
-	msgDefender.Text = fmt.Sprintf(msgDef+"%v damage\n"+
-		"\nYour  ❤️ : %v\n"+
-		"Enemy 💙 : %v\n",
-		damage, defender.Health, attacker.Health)
-	return msgAttacker, msgDefender
 }

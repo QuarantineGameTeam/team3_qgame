@@ -33,17 +33,24 @@ func NewBotController(bot *api.Bot) *BotController {
 	}
 }
 
-func (b *BotController) StartWebHookListener(updater Updater) {
+func (b *BotController) StartWebHookListener(userUpd, fightUpd Updater) {
 	updates := b.Bot.ListenForWebhook(webHookPrefix)
 
-	updater.SetUpdates(b.Bot, updates)
+	userUpd.SetUpdates(b.Bot, updates)
+	fightUpd.SetUpdates(b.Bot, updates)
 
 	for update := range updates {
 		if update.Message != nil {
-			updater.Messages(update)
+
+			// ToDo separate requests  ! !  !  ! !  !  !
+			userUpd.Messages(update)
+			fightUpd.Messages(update)
 		}
 		if update.CallbackQuery != nil {
-			updater.CallbackQuery(update)
+
+			// ToDo separate requests !  ! !  ! !  ! !
+			userUpd.CallbackQuery(update)
+			fightUpd.CallbackQuery(update)
 		}
 	}
 }

@@ -39,10 +39,16 @@ func main() {
 	// Initiate new user action instance
 	userAct := actions.NewUser(userRepo)
 
-	// Create new update Manager
-	updManager := updater.NewUpdateManager(userAct)
+	// Initiate new user action instance
+	fighting := actions.NewFight(userRepo)
 
-	//var useract user.UpdateManager
-	//var uact user.UpdateManager
-	botController.StartWebHookListener(updManager)
+	// Create new user update
+	updUser := updater.NewUserUpdate(userAct)
+
+	//
+	updFight := updater.NewFightUpdater(fighting)
+
+	//var useract user.UserUpdater
+	//var uact user.UserUpdater
+	botController.StartWebHookListener(updUser, updFight)
 }
