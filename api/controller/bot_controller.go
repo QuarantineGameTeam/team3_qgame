@@ -3,7 +3,7 @@ package controller
 import (
 	"log"
 
-	"gihub.com/team3_qgame/api"
+	"github.com/team3_qgame/api"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )

@@ -2,8 +2,8 @@ package api
 
 import (
 	"fmt"
-	"gihub.com/team3_qgame/config/bot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/team3_qgame/config/bot"
 	"log"
 	"net/http"
 )

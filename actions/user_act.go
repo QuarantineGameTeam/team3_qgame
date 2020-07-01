@@ -3,8 +3,8 @@ package actions
 import (
 	"database/sql"
 	"fmt"
-	"gihub.com/team3_qgame/database/repository"
-	"gihub.com/team3_qgame/model"
+	"github.com/team3_qgame/database/repository"
+	"github.com/team3_qgame/model"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -278,6 +278,7 @@ func (u *User) attackCallBack(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "")
 	userCheck, _ := u.userRepo.GetUserByID(chatID)
 	for update := range u.updates {
+
 		switch update.CallbackQuery.Data {
 		case "strength":
 			u.attackersTurn = Turn{userCheck.Strength, 0}
@@ -458,9 +459,8 @@ func fightMsg(
 	defender model.User,
 	damage float64,
 	msgAtt string,
-	msgDef string) (
-	msgAttacker tgbotapi.MessageConfig,
-	msgDefender tgbotapi.MessageConfig) {
+	msgDef string,
+) (msgAttacker tgbotapi.MessageConfig, msgDefender tgbotapi.MessageConfig) {
 
 	msgAttacker = tgbotapi.NewMessage(attacker.ID, "")
 	msgDefender = tgbotapi.NewMessage(defender.ID, "")

@@ -2,8 +2,8 @@ package config
 
 import (
 	"flag"
-	"gihub.com/team3_qgame/config/bot"
-	"gihub.com/team3_qgame/config/database"
+	"github.com/team3_qgame/config/bot"
+	"github.com/team3_qgame/config/database"
 	"log"
 )
 

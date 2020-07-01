@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 
-	"gihub.com/team3_qgame/actions"
-	"gihub.com/team3_qgame/api"
-	"gihub.com/team3_qgame/api/controller"
-	"gihub.com/team3_qgame/api/updater"
-	"gihub.com/team3_qgame/config"
-	"gihub.com/team3_qgame/database"
-	"gihub.com/team3_qgame/database/repository"
+	"github.com/team3_qgame/actions"
+	"github.com/team3_qgame/api"
+	"github.com/team3_qgame/api/controller"
+	"github.com/team3_qgame/api/updater"
+	"github.com/team3_qgame/config"
+	"github.com/team3_qgame/database"
+	"github.com/team3_qgame/database/repository"
 )
 
 /*

@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"gihub.com/team3_qgame/config/database"
+	"github.com/team3_qgame/config/database"
 	"log"
 
 	_ "github.com/lib/pq"

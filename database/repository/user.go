@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"gihub.com/team3_qgame/model"
+	"github.com/team3_qgame/model"
 	"log"
 )
 
