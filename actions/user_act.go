@@ -19,8 +19,9 @@ const (
 		"\n/allusers - get every bot users" +
 		"\n/changeteam - change or set your team" +
 		"\n/rating - get my game rating" +
-		"\n/startfight - lets start the fight "
-	noTeamString string = "noteam"
+		"\n/startfight - lets start the fight "+
+		"\n/inventory - shows your inventory and equipment"
+	noTeamString string  = "noteam"
 )
 
 type User struct {
@@ -230,6 +231,24 @@ func (u *User) Rating(update tgbotapi.Update) {
 			user.Level, user.Defence, user.Health, user.Intellect, user.Strength, totalRating,
 		)
 		u.bot.Send(msg)
+	} else {
+		msg.Text = "You have no user yet"
+		u.bot.Send(msg)
+	}
+}
+
+func (u *User) Inventory (update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	user, err := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if err != nil {
+		msg.Text = "Internal server error"
+		log.Println("GetUserByID Err:", err)
+		u.bot.Send(msg)
+		return
+	}
+	if user.ID == update.Message.Chat.ID {
+		msg.Text = "Your inventory:" + string(user.Inventory)
+			u.bot.Send(msg)
 	} else {
 		msg.Text = "You have no user yet"
 		u.bot.Send(msg)

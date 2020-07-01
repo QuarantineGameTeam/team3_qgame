@@ -8,7 +8,8 @@ CREATE TABLE users
     strength  DECIMAL NOT NULL DEFAULT 1,
     defence   DECIMAL NOT NULL DEFAULT 1,
     intellect DECIMAL NOT NULL DEFAULT 1,
-    level DECIMAL NOT NULL DEFAULT 0,
-    currency DECIMAL NOT NULL DEFAULT 50,
-        PRIMARY KEY (id)
+    level     DECIMAL NOT NULL DEFAULT 0,
+    currency  DECIMAL NOT NULL DEFAULT 50,
+    inventory INTEGER[],
+    PRIMARY   KEY (id)
 );
