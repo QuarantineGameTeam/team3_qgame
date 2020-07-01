@@ -103,6 +103,18 @@ func (u *User) CGetUserInfo(update tgbotapi.Update) {
 	}
 }
 
+func (u *User) CBuySell(update tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	userCheck, _ := u.userRepo.GetUserByID(update.Message.Chat.ID)
+	if userCheck.ID == update.Message.Chat.ID {
+		msg.Text = "Your currency:" + fmt.Sprintf("\n%+v", userCheck.Currency)
+		u.bot.Send(msg)
+	} else {
+		msg.Text = "You have no currency"
+		u.bot.Send(msg)
+	}
+}
+
 func (u *User) CGetAllUsers(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	allUsers, _ := u.userRepo.GetAllUsers()
@@ -278,16 +290,22 @@ func (u *User) attackCallBack(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "")
 	userCheck, _ := u.userRepo.GetUserByID(chatID)
 	for update := range u.updates {
-
-		switch update.CallbackQuery.Data {
-		case "strength":
-			u.attackersTurn = Turn{userCheck.Strength, 0}
-			msg.Text = "Attack with bow 🏹"
-		case "intellect":
-			u.attackersTurn = Turn{0, userCheck.Intellect}
-			msg.Text = "Attack with rainbow 🏳️‍🌈"
+		if update.Message != nil {
+			continue
 		}
-		break
+		if update.CallbackQuery.Message.Chat.ID == chatID {
+			switch update.CallbackQuery.Data {
+			case "strength":
+				u.attackersTurn = Turn{userCheck.Strength, 0}
+				msg.Text = "Attack with bow 🏹"
+			case "intellect":
+				u.attackersTurn = Turn{0, userCheck.Intellect}
+				msg.Text = "Attack with rainbow 🏳️‍🌈"
+			}
+			break
+		} else {
+			continue
+		}
 	}
 	u.bot.Send(msg)
 }
@@ -296,15 +314,22 @@ func (u *User) defenceCallBack(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "")
 	userCheck, _ := u.userRepo.GetUserByID(chatID)
 	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "strength":
-			u.defendersTurn = Turn{userCheck.Defence, 0}
-			msg.Text = "Use shield"
-		case "intellect":
-			u.defendersTurn = Turn{0, userCheck.Defence}
-			msg.Text = "Use magic shield"
+		if update.Message != nil {
+			continue
 		}
-		break
+		if update.CallbackQuery.Message.Chat.ID == chatID {
+			switch update.CallbackQuery.Data {
+			case "strength":
+				u.defendersTurn = Turn{userCheck.Defence, 0}
+				msg.Text = "Use shield"
+			case "intellect":
+				u.defendersTurn = Turn{0, userCheck.Defence}
+				msg.Text = "Use magic shield"
+			}
+			break
+		} else {
+			continue
+		}
 	}
 	u.bot.Send(msg)
 }
@@ -327,40 +352,53 @@ func (u *User) Fight(update tgbotapi.Update) {
 	u.startFightKb(u.user.ID)
 
 	for update := range u.updates {
-		switch update.CallbackQuery.Data {
-		case "Fight":
-			msgUser.Text = "Searching for the enemy ..."
-			u.bot.Send(msgUser)
-			findEnemy := false
-			for findEnemy == false {
-				u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
-				if err != nil {
-					log.Println("GetRandomUser Err:", err)
-					return
-				}
-				msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
-				u.startFightKb(u.enemy.ID)
-				for update := range u.updates {
-					switch update.CallbackQuery.Data {
-					case "Fight":
-						findEnemy = true
-						msgEnemy.Text = "Fight started"
-						u.bot.Send(msgEnemy)
-					case "Back":
-						msgEnemy.Text = "Retreat"
-						u.bot.Send(msgEnemy)
-					}
-					break
-				}
-			}
-		case "Back":
-			msgUser.Text = "Retreat"
-			u.bot.Send(msgUser)
-			return
+		if update.Message != nil {
+			continue
 		}
-		break
+		if update.CallbackQuery.Message.Chat.ID == u.user.ID {
+			switch update.CallbackQuery.Data {
+			case "Fight":
+				msgUser.Text = "Searching for the enemy ..."
+				u.bot.Send(msgUser)
+				findEnemy := false
+				for findEnemy == false {
+					u.enemy, err = u.userRepo.GetRandomUser(u.user.ID)
+					if err != nil {
+						log.Println("GetRandomUser Err:", err)
+						return
+					}
+					msgEnemy := tgbotapi.NewMessage(u.enemy.ID, "")
+					u.startFightKb(u.enemy.ID)
+					for update := range u.updates {
+						if update.Message != nil {
+							continue
+						}
+						if update.CallbackQuery.Message.Chat.ID == u.enemy.ID {
+							switch update.CallbackQuery.Data {
+							case "Fight":
+								findEnemy = true
+								msgEnemy.Text = "Fight started"
+								u.bot.Send(msgEnemy)
+							case "Back":
+								msgEnemy.Text = "Retreat"
+								u.bot.Send(msgEnemy)
+							}
+							break
+						} else {
+							continue
+						}
+					}
+				}
+			case "Back":
+				msgUser.Text = "Retreat"
+				u.bot.Send(msgUser)
+				return
+			}
+			break
+		} else {
+			continue
+		}
 	}
-
 	u.SwitchStatus(u.user.ID)
 	u.SwitchStatus(u.enemy.ID)
 
@@ -459,8 +497,10 @@ func fightMsg(
 	defender model.User,
 	damage float64,
 	msgAtt string,
-	msgDef string,
-) (msgAttacker tgbotapi.MessageConfig, msgDefender tgbotapi.MessageConfig) {
+	msgDef string) (
+	msgAttacker tgbotapi.MessageConfig,
+	msgDefender tgbotapi.MessageConfig,
+) {
 
 	msgAttacker = tgbotapi.NewMessage(attacker.ID, "")
 	msgDefender = tgbotapi.NewMessage(defender.ID, "")
