@@ -2,8 +2,8 @@ package config
 
 import (
 	"flag"
-	"gihub.com/team3_qgame/config/bot"
-	"gihub.com/team3_qgame/config/database"
+	"github.com/team3_qgame/config/bot"
+	"github.com/team3_qgame/config/database"
 	"log"
 )
 
@@ -16,6 +16,7 @@ func (c *Config) InitConfig() {
 	c.BotConfig.InitBotConfig()
 	c.DBConfig.InitPgConfig()
 	flag.Parse()
+
 
 	log.Println("app starts with follow config: . . .")
 	log.Printf("database configs:\n host=%s ,\n port=%d ,\n user_name=%s ,\n db_name=%s ;\n",
