@@ -111,8 +111,7 @@ func (f *Fight) attackCallBack(chatID int64) {
 	for update := range f.updates {
 		if update.Message != nil {
 			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == chatID {
+		} else if update.CallbackQuery.Message.Chat.ID == chatID {
 			switch update.CallbackQuery.Data {
 			case "strength":
 				f.attackersTurn = Turn{userCheck.Strength, 0}
@@ -135,8 +134,7 @@ func (f *Fight) defenceCallBack(chatID int64) {
 	for update := range f.updates {
 		if update.Message != nil {
 			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == chatID {
+		} else if update.CallbackQuery.Message.Chat.ID == chatID {
 			switch update.CallbackQuery.Data {
 			case "strength":
 				f.defendersTurn = Turn{userCheck.Defence, 0}
@@ -173,8 +171,7 @@ func (f *Fight) Fight(update tgbotapi.Update) {
 	for update := range f.updates {
 		if update.Message != nil {
 			continue
-		}
-		if update.CallbackQuery.Message.Chat.ID == f.user.ID {
+		} else if update.CallbackQuery.Message.Chat.ID == f.user.ID {
 			switch update.CallbackQuery.Data {
 			case "Fight":
 				msgUser.Text = "Searching for the enemy ..."
@@ -191,8 +188,7 @@ func (f *Fight) Fight(update tgbotapi.Update) {
 					for update := range f.updates {
 						if update.Message != nil {
 							continue
-						}
-						if update.CallbackQuery.Message.Chat.ID == f.enemy.ID {
+						} else if update.CallbackQuery.Message.Chat.ID == f.enemy.ID {
 							switch update.CallbackQuery.Data {
 							case "Fight":
 								findEnemy = true

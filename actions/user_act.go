@@ -6,6 +6,8 @@ import (
 	"github.com/team3_qgame/database/repository"
 	"github.com/team3_qgame/model"
 	"log"
+	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -19,9 +21,9 @@ const (
 		"\n/allusers - get every bot users" +
 		"\n/changeteam - change or set your team" +
 		"\n/rating - get my game rating" +
-		"\n/startfight - lets start the fight "+
+		"\n/startfight - lets start the fight " +
 		"\n/inventory - shows your inventory and equipment"
-	noTeamString string  = "noteam"
+	noTeamString string = "noteam"
 )
 
 type User struct {
@@ -237,7 +239,7 @@ func (u *User) Rating(update tgbotapi.Update) {
 	}
 }
 
-func (u *User) Inventory (update tgbotapi.Update) {
+func (u *User) Inventory(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	user, err := u.userRepo.GetUserByID(update.Message.Chat.ID)
 	if err != nil {
@@ -247,8 +249,14 @@ func (u *User) Inventory (update tgbotapi.Update) {
 		return
 	}
 	if user.ID == update.Message.Chat.ID {
-		msg.Text = "Your inventory:" + string(user.Inventory)
-			u.bot.Send(msg)
+		inventoryText := []string{}
+		for i := range u.user.Inventory {
+			number := u.user.Inventory[i]
+			text := strconv.Itoa(number)
+			inventoryText = append(inventoryText, text)
+		}
+		msg.Text = "Your inventory:" + strings.Join(inventoryText, ",")
+		u.bot.Send(msg)
 	} else {
 		msg.Text = "You have no user yet"
 		u.bot.Send(msg)
