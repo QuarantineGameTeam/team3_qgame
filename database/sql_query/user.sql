@@ -10,6 +10,6 @@ CREATE TABLE users
     intellect DECIMAL NOT NULL DEFAULT 1,
     level     DECIMAL NOT NULL DEFAULT 0,
     currency  DECIMAL NOT NULL DEFAULT 50,
-    inventory INTEGER[],
+    inventory INTEGER[] NOT NULL DEFAULT ARRAY[]::integer[],
     PRIMARY   KEY (id)
 );

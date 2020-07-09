@@ -1,15 +1,14 @@
 package actions
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/team3_qgame/database/repository"
 	"github.com/team3_qgame/model"
 	"log"
 	"strconv"
-	"strings"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -21,7 +20,7 @@ const (
 		"\n/allusers - get every bot users" +
 		"\n/changeteam - change or set your team" +
 		"\n/rating - get my game rating" +
-		"\n/startfight - lets start the fight " +
+		"\n/f_start - lets start the fight " +
 		"\n/inventory - shows your inventory and equipment"
 	noTeamString string = "noteam"
 )
@@ -249,13 +248,13 @@ func (u *User) Inventory(update tgbotapi.Update) {
 		return
 	}
 	if user.ID == update.Message.Chat.ID {
-		inventoryText := []string{}
+		inventoryText := []int64{}
 		for i := range u.user.Inventory {
 			number := u.user.Inventory[i]
-			text := strconv.Itoa(number)
-			inventoryText = append(inventoryText, text)
+			//text := strconv.Itoa(number)
+			inventoryText = append(inventoryText, number)
 		}
-		msg.Text = "Your inventory:" + strings.Join(inventoryText, ",")
+		msg.Text = "Your inventory:" + arrayToString(inventoryText, ",")
 		u.bot.Send(msg)
 	} else {
 		msg.Text = "You have no user yet"
@@ -302,4 +301,17 @@ func (u *User) kbDefence(chatID int64) {
 
 	msg.ReplyMarkup = &replyMarkup
 	u.bot.Send(msg)
+}
+
+func arrayToString(A []int64, delim string) string {
+
+	var buffer bytes.Buffer
+	for i := 0; i < len(A); i++ {
+		buffer.WriteString(strconv.FormatInt(A[i], 10))
+		if i != len(A)-1 {
+			buffer.WriteString(delim)
+		}
+	}
+
+	return buffer.String()
 }

@@ -28,7 +28,7 @@ func (u *UserUpdater) SetUpdates(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesC
 func (u *UserUpdater) Messages(update tgbotapi.Update) {
 	if update.Message.IsCommand() {
 		switch update.Message.Command() {
-		case "startfight":
+		case "f_start":
 			u.fight.Fight(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
