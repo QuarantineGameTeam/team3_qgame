@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 
-	"gihub.com/team3_qgame/actions"
-	"gihub.com/team3_qgame/api"
-	"gihub.com/team3_qgame/api/controller"
-	"gihub.com/team3_qgame/api/updater"
-	"gihub.com/team3_qgame/config"
-	"gihub.com/team3_qgame/database"
-	"gihub.com/team3_qgame/database/repository"
+	"github.com/team3_qgame/actions"
+	"github.com/team3_qgame/api"
+	"github.com/team3_qgame/api/controller"
+	"github.com/team3_qgame/api/updater"
+	"github.com/team3_qgame/config"
+	"github.com/team3_qgame/database"
+	"github.com/team3_qgame/database/repository"
 )
 
 /*
@@ -39,10 +39,16 @@ func main() {
 	// Initiate new user action instance
 	userAct := actions.NewUser(userRepo)
 
-	// Create new update Manager
-	updManager := updater.NewUpdateManager(userAct)
+	// Initiate new user action instance
+	fighting := actions.NewFight(userRepo)
 
-	//var useract user.UpdateManager
-	//var uact user.UpdateManager
-	botController.StartWebHookListener(updManager)
+	// Create new user update
+	updUser := updater.NewUserUpdate(userAct)
+
+	//
+	updFight := updater.NewFightUpdater(fighting)
+
+	//var useract user.UserUpdater
+	//var uact user.UserUpdater
+	botController.StartWebHookListener(updUser, updFight)
 }

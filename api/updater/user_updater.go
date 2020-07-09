@@ -1,7 +1,7 @@
 package updater
 
 import (
-	"gihub.com/team3_qgame/actions"
+	"github.com/team3_qgame/actions"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -12,7 +12,7 @@ type UpdateManager struct {
 	user    *actions.User
 }
 
-func NewUpdateManager(user *actions.User) *UpdateManager {
+func NewUserUpdate(user *actions.User) *UpdateManager {
 	return &UpdateManager{
 		user: user,
 	}
@@ -45,10 +45,12 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 		case "changeteam":
 			u.user.CStartTeamSelection(update)
 			u.user.TeamChange(update)
-		case "startfight":
-			u.user.Fight(update)
 		case "rating":
 			u.user.Rating(update)
+		case "buysell":
+			u.user.CBuySell(update)
+		case "inventory":
+			u.user.Inventory(update)
 		default:
 			u.bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, "WRONG COMMAND!"))
 		}

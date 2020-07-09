@@ -1,6 +1,9 @@
 package model
 
-import "database/sql"
+import (
+	"database/sql"
+	"github.com/lib/pq"
+)
 
 /*
 	In this file, the model that we will often use will be described. Such models as User, World, Weapons, etc.
@@ -13,10 +16,12 @@ type User struct {
 	ID        int64          `json:"id"`
 	Name      string         `json:"name"`
 	Team      sql.NullString `json:"team"`
-	Role      sql.NullString `json:"role"`
+	Status    bool           `json:"role"`
 	Health    float64        `json:"health"`
 	Strength  float64        `json:"strength"`
 	Defence   float64        `json:"defence"`
 	Intellect float64        `json:"intellect"`
 	Level     float64        `json:"level"`
+	Currency  int            `json:"currency"`
+	Inventory pq.Int64Array  `json:"inventory"`
 }
