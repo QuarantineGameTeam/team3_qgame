@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -13,6 +14,9 @@ import (
 const (
 	helpFightMsg         = ""
 	mult         float64 = 25
+
+	fightStatus = "fight"
+	mainStaus   = "main"
 
 	succesAtt    = "Attack successful\nYou deal "
 	unsuccsesAtt = "Unsuccessful attack\nYou deal "
@@ -54,14 +58,19 @@ func (f *Fight) CHelp(update tgbotapi.Update) {
 	f.bot.Send(msg)
 }
 
-func (f *Fight) SwitchStatus(ChatID int64) {
+func (f *Fight) SwitchStatus(ChatID int64, status string) {
 	userCheck, _ := f.userRepo.GetUserByID(ChatID)
-	if userCheck.ID == ChatID {
-		userCheck.Status = !userCheck.Status
-		_ = f.userRepo.UpdateUser(userCheck)
-	} else {
-		log.Println("status switch error")
+	userCheck.Status = status
+	_ = f.userRepo.UpdateUser(userCheck)
+}
+
+func (f *Fight) CheckStatus(ChatID int64, status string) error {
+	userCheck, _ := f.userRepo.GetUserByID(ChatID)
+	if userCheck.Status != status {
+		err := errors.New("wrong status")
+		return err
 	}
+	return nil
 }
 
 func (f *Fight) startFightKb(ChatID int64) {
@@ -151,8 +160,38 @@ func (f *Fight) defenceCallBack(chatID int64) {
 	f.bot.Send(msg)
 }
 
-func (f *Fight) Fight(update tgbotapi.Update) {
+func (f *Fight) getEnemy() (bool, error) {
+	var err error
+	f.enemy, err = f.userRepo.GetRandomUser(f.user.ID)
+	if err != nil {
+		log.Println("GetRandomUser Err:", err)
+		return false, err
+	}
+	msgEnemy := tgbotapi.NewMessage(f.enemy.ID, "")
+	f.startFightKb(f.enemy.ID)
+	for update := range f.updates {
+		if update.Message != nil {
+			continue
+		} else if update.CallbackQuery.Message.Chat.ID == f.enemy.ID {
+			switch update.CallbackQuery.Data {
+			case "f_fight":
+				findEnemy := true
+				msgEnemy.Text = "Fight started"
+				f.bot.Send(msgEnemy)
+				return findEnemy, nil
+			case "f_back":
+				msgEnemy.Text = "Retreat"
+				f.bot.Send(msgEnemy)
+			}
+			break
+		} else {
+			continue
+		}
+	}
+	return false, nil
+}
 
+func (f *Fight) enemySearch(update tgbotapi.Update) {
 	var (
 		err     error
 		msgUser = tgbotapi.NewMessage(update.Message.Chat.ID, "")
@@ -178,31 +217,7 @@ func (f *Fight) Fight(update tgbotapi.Update) {
 				f.bot.Send(msgUser)
 				findEnemy := false
 				for findEnemy == false {
-					f.enemy, err = f.userRepo.GetRandomUser(f.user.ID)
-					if err != nil {
-						log.Println("GetRandomUser Err:", err)
-						return
-					}
-					msgEnemy := tgbotapi.NewMessage(f.enemy.ID, "")
-					f.startFightKb(f.enemy.ID)
-					for update := range f.updates {
-						if update.Message != nil {
-							continue
-						} else if update.CallbackQuery.Message.Chat.ID == f.enemy.ID {
-							switch update.CallbackQuery.Data {
-							case "Fight":
-								findEnemy = true
-								msgEnemy.Text = "Fight started"
-								f.bot.Send(msgEnemy)
-							case "Back":
-								msgEnemy.Text = "Retreat"
-								f.bot.Send(msgEnemy)
-							}
-							break
-						} else {
-							continue
-						}
-					}
+					findEnemy, _ = f.getEnemy()
 				}
 			case "Back":
 				msgUser.Text = "Retreat"
@@ -214,8 +229,15 @@ func (f *Fight) Fight(update tgbotapi.Update) {
 			continue
 		}
 	}
-	f.SwitchStatus(f.user.ID)
-	f.SwitchStatus(f.enemy.ID)
+
+}
+
+func (f *Fight) Fight(update tgbotapi.Update) {
+
+	f.enemySearch(update)
+
+	f.SwitchStatus(f.user.ID, fightStatus)
+	f.SwitchStatus(f.enemy.ID, fightStatus)
 
 	attacker := f.user
 	defender := f.enemy
@@ -294,8 +316,8 @@ func (f *Fight) Fight(update tgbotapi.Update) {
 		attacker, defender = defender, attacker
 	}
 
-	f.SwitchStatus(f.user.ID)
-	f.SwitchStatus(f.enemy.ID)
+	f.SwitchStatus(f.user.ID, mainStaus)
+	f.SwitchStatus(f.enemy.ID, mainStaus)
 }
 
 func fightMsg(

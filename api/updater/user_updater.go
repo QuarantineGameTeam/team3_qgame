@@ -30,7 +30,7 @@ func (u *UpdateManager) Messages(update tgbotapi.Update) {
 		switch update.Message.Command() {
 		case "start":
 			u.user.CStart(update)
-		case "register":
+		case "registration":
 			u.user.CRegistration(update)
 		case "delete":
 			u.user.CDelete(update)

@@ -10,10 +10,10 @@ import (
 const (
 	getOneItem    = `SELECT * FROM public.users WHERE id = $1;`
 	addOneItem    = `INSERT INTO public.users (id, name) VALUES ($1, $2);`
-	updateItem    = `UPDATE public.users SET name=$2, team=$3, status=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9, inventory=$10, WHERE id=$1;`
+	updateItem    = `UPDATE public.users SET name=$2, team=$3, status=$4, health=$5, strength=$6, defence=$7, intellect=$8, level=$9, inventory=$10 WHERE id=$1;`
 	deleteItem    = `DELETE FROM public.users WHERE id=$1;`
 	getAllItems   = `SELECT * FROM public.users;`
-	getRandomItem = `SELECT * FROM public.users WHERE NOT id = $1 AND NOT status = TRUE ORDER BY RANDOM() LIMIT 1;`
+	getRandomItem = `SELECT * FROM public.users WHERE NOT id = $1 AND status = 'main' ORDER BY RANDOM() LIMIT 1;`
 )
 
 type UserRepository struct {

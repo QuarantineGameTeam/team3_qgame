@@ -14,7 +14,7 @@ import (
 
 const (
 	helpMsg = "\n/help - get all commands" +
-		"\n/register - bot register new user" +
+		"\n/registration - bot register new user" +
 		"\n/rename - change user name" +
 		"\n/delete - delete user" +
 		"\n/me - shows your use data" +
@@ -163,15 +163,6 @@ func (u *User) CStartTeamSelection(update tgbotapi.Update) {
 	u.bot.Send(msg)
 }
 
-func (u *User) SwitchStatus(ChatID int64) {
-	userCheck, _ := u.userRepo.GetUserByID(ChatID)
-	if userCheck.ID == ChatID {
-		userCheck.Status = !userCheck.Status
-		_ = u.userRepo.UpdateUser(userCheck)
-	} else {
-		log.Println("status switch error")
-	}
-}
 
 func NewNullString(s string) sql.NullString {
 	if len(s) == 0 {
@@ -303,3 +294,4 @@ func (u *User) kbDefence(chatID int64) {
 	msg.ReplyMarkup = &replyMarkup
 	u.bot.Send(msg)
 }
+
