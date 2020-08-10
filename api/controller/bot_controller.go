@@ -2,6 +2,7 @@ package controller
 
 import (
 	"log"
+	"strings"
 
 	"github.com/team3_qgame/api"
 
@@ -41,16 +42,21 @@ func (b *BotController) StartWebHookListener(userUpd, fightUpd Updater) {
 
 	for update := range updates {
 		if update.Message != nil {
-
-			// ToDo separate requests  ! !  !  ! !  !  !
-			userUpd.Messages(update)
-			fightUpd.Messages(update)
+			if update.Message.IsCommand() {
+				if strings.HasPrefix(update.Message.Command(), "f_") {
+					fightUpd.Messages(update)
+				} else {
+					userUpd.Messages(update)
+				}
+			}
 		}
 		if update.CallbackQuery != nil {
+			if strings.HasPrefix(update.CallbackQuery.Data, "f_") {
+				fightUpd.CallbackQuery(update)
+			} else {
+				userUpd.CallbackQuery(update)
+			}
 
-			// ToDo separate requests !  ! !  ! !  ! !
-			userUpd.CallbackQuery(update)
-			fightUpd.CallbackQuery(update)
 		}
 	}
 }

@@ -77,10 +77,10 @@ func (f *Fight) startFightKb(ChatID int64) {
 	msg := tgbotapi.NewMessage(ChatID, "Are you sure")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "Fight"),
+			tgbotapi.NewInlineKeyboardButtonData("В БІЙ!!!", "f_fight"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Назад", "Back"),
+			tgbotapi.NewInlineKeyboardButtonData("Назад", "f_back"),
 		),
 	)
 
@@ -92,8 +92,8 @@ func (f *Fight) kbAttack(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "Attack")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Attack⚔️", "strength"),
-			tgbotapi.NewInlineKeyboardButtonData("Attack💫", "intellect"),
+			tgbotapi.NewInlineKeyboardButtonData("Attack⚔️", "f_strength"),
+			tgbotapi.NewInlineKeyboardButtonData("Attack💫", "f_intellect"),
 		),
 	)
 
@@ -105,8 +105,8 @@ func (f *Fight) kbDefence(chatID int64) {
 	msg := tgbotapi.NewMessage(chatID, "Defence")
 	replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Defence🛡", "strength"),
-			tgbotapi.NewInlineKeyboardButtonData("Defence🔮", "intellect"),
+			tgbotapi.NewInlineKeyboardButtonData("Defence🛡", "f_strength"),
+			tgbotapi.NewInlineKeyboardButtonData("Defence🔮", "f_intellect"),
 		),
 	)
 
@@ -122,10 +122,10 @@ func (f *Fight) attackCallBack(chatID int64) {
 			continue
 		} else if update.CallbackQuery.Message.Chat.ID == chatID {
 			switch update.CallbackQuery.Data {
-			case "strength":
+			case "f_strength":
 				f.attackersTurn = Turn{userCheck.Strength, 0}
 				msg.Text = "Attack with bow 🏹"
-			case "intellect":
+			case "f_intellect":
 				f.attackersTurn = Turn{0, userCheck.Intellect}
 				msg.Text = "Attack with rainbow 🏳️‍🌈"
 			}
@@ -145,10 +145,10 @@ func (f *Fight) defenceCallBack(chatID int64) {
 			continue
 		} else if update.CallbackQuery.Message.Chat.ID == chatID {
 			switch update.CallbackQuery.Data {
-			case "strength":
+			case "f_strength":
 				f.defendersTurn = Turn{userCheck.Defence, 0}
 				msg.Text = "Use shield"
-			case "intellect":
+			case "f_intellect":
 				f.defendersTurn = Turn{0, userCheck.Defence}
 				msg.Text = "Use magic shield"
 			}
@@ -212,14 +212,14 @@ func (f *Fight) enemySearch(update tgbotapi.Update) {
 			continue
 		} else if update.CallbackQuery.Message.Chat.ID == f.user.ID {
 			switch update.CallbackQuery.Data {
-			case "Fight":
+			case "f_fight":
 				msgUser.Text = "Searching for the enemy ..."
 				f.bot.Send(msgUser)
 				findEnemy := false
 				for findEnemy == false {
 					findEnemy, _ = f.getEnemy()
 				}
-			case "Back":
+			case "f_back":
 				msgUser.Text = "Retreat"
 				f.bot.Send(msgUser)
 				return
